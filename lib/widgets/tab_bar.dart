@@ -76,7 +76,9 @@ class CustomTabBar extends StatelessWidget {
                     CustomCard(
                       customTextStyle: customTextStyle,
                       buttonText: 'Accept',
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/pickup');
+                      },
                       btncolor: Color(0xFFBD2019),
                     ),
                     CustomCard(
