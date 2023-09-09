@@ -1,5 +1,6 @@
 import 'package:driver_app/view/home.page.dart';
 import 'package:driver_app/view/login.page.dart';
+import 'package:driver_app/view/pickup.page.dart';
 import 'package:flutter/material.dart';
 
 import 'routes/app_routes.dart';
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
       routes: {
         loginRoute: (context) => LoginPage(), // Use the imported route
         homeRoute: (context) => HomePage(),
+        pickupRoute: (context) => PickUpPage(),
       },
     );
   }
