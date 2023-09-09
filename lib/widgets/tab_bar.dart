@@ -87,7 +87,16 @@ class CustomTabBar extends StatelessWidget {
                     ),
                   ],
                 ),
-                Center(child: Text('Completed Content')),
+                Column(
+                  children: [
+                    CompletedCard(
+                      customTextStyle: customTextStyle,
+                    ),
+                    CompletedCard(
+                      customTextStyle: customTextStyle,
+                    ),
+                  ],
+                ),
                 Center(child: Text('Failed Content')),
               ],
             ),
