@@ -1,17 +1,7 @@
+import 'package:driver_app/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(LoginApp());
-}
-
-class LoginApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginPage(),
-    );
-  }
-}
+import '../widgets/login_elevated_button.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -29,43 +19,21 @@ class LoginPage extends StatelessWidget {
                 height: null,
               ),
               const SizedBox(height: 50.0),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Email Address',
-                  labelStyle: const TextStyle(fontSize: 15.0),
-                  hintText: 'Enter your Email Address',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(40.0),
-                  ),
-                ),
+              const LoginTextField(
+                labelText: 'Email Address',
+                hintText: 'Enter your Email Address',
               ),
               const SizedBox(height: 10.0),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(fontSize: 15.0),
-                  hintText: 'Enter your Email Address',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(40.0),
-                  ),
-                ),
+              const LoginTextField(
+                labelText: 'Password',
+                hintText: 'Enter your Password',
               ),
               const SizedBox(
                 height: 65.0,
               ),
-              ElevatedButton(
+              LoginElevatedButton(
+                text: 'Login',
                 onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFBD2019),
-                  minimumSize: const Size(double.infinity, 48.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(fontSize: 18.0),
-                ),
               ),
             ],
           ),
