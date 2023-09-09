@@ -339,26 +339,25 @@ class _PickedUpCardState extends State<PickedUpCard> {
                       ),
                       child: Stack(
                         children: [
-                          _image != null
-                              ? Image.file(
-                                  _image!,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : const SizedBox.shrink(),
+                          Center(
+                            child: Icon(
+                              Icons.camera_alt,
+                              color:
+                                  Color(0xFF5E738A), // Set icon color to 5E738A
+                            ),
+                          ),
                           Positioned(
                             top: 5,
                             right: 5,
                             child: _imageCaptured
                                 ? IconButton(
                                     onPressed: _deleteImage,
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.close,
                                       color: Colors.red,
                                     ),
                                   )
-                                : const SizedBox.shrink(),
+                                : SizedBox.shrink(),
                           ),
                           Align(
                             alignment: Alignment.bottomRight,
@@ -372,7 +371,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
                                           ? _image!.path.split('/').last
                                           : 'No Image'
                                       : '',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                   ),
                                 ),
@@ -385,6 +384,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
                       height: 150.0, // Adjust the height as needed
                     ),
                   ),
+
                   // Display the captured image
                   // if (_image != null)
                   //   Image.file(
