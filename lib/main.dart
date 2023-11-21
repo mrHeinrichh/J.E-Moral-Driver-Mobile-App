@@ -1,3 +1,10 @@
+// Import necessary packages
+import 'package:driver_app/view/user_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'routes/app_routes.dart';
+
+// Import your view pages
 import 'package:driver_app/view/scandropcancel.page.dart';
 import 'package:driver_app/view/payment.page.dart';
 import 'package:driver_app/view/scandrop.page.dart';
@@ -5,12 +12,17 @@ import 'package:driver_app/view/home.page.dart';
 import 'package:driver_app/view/login.page.dart';
 import 'package:driver_app/view/pickup.page.dart';
 import 'package:driver_app/view/gps.page.dart';
-import 'package:flutter/material.dart';
-
-import 'routes/app_routes.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        // Other providers if any
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
