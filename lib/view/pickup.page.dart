@@ -1,3 +1,4 @@
+import 'package:driver_app/widgets/completed_cards.dart';
 import 'package:driver_app/widgets/custom_cards.dart';
 import 'package:flutter/material.dart';
 

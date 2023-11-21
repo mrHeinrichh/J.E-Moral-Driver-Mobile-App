@@ -1,8 +1,13 @@
 import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/widgets/completed_cards.dart';
 import 'package:driver_app/widgets/custom_cards.dart';
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatelessWidget {
+  final List<Map<String, dynamic>> transactions;
+
+  CustomTabBar({required this.transactions});
+
   final TextStyle customTextStyle = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.bold,
@@ -71,23 +76,25 @@ class CustomTabBar extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                Column(
-                  children: [
-                    CustomCard(
-                      customTextStyle: customTextStyle,
-                      buttonText: 'Accept',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/pickup');
-                      },
-                      btncolor: Color(0xFFBD2019),
-                    ),
-                    CustomCard(
-                      customTextStyle: customTextStyle,
-                      buttonText: 'Accept',
-                      onPressed: () {},
-                      btncolor: Color(0xFF5E738A),
-                    ),
-                  ],
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Column(
+                        children: [
+                          for (var transaction in transactions)
+                            CustomCard(
+                              customTextStyle: customTextStyle,
+                              buttonText: 'Accept',
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/pickup');
+                              },
+                              btncolor: Color(0xFFBD2019),
+                              transactionData: transaction,
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 Column(
                   children: [

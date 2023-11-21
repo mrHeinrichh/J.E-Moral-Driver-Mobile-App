@@ -1,3 +1,4 @@
+import 'package:driver_app/widgets/completed_cards.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_cards.dart';
 import '../widgets/card_button.dart';
@@ -55,7 +56,7 @@ class ScanDropPage extends StatelessWidget {
                 spareButton(
                   text: 'DROP OFF',
                   onPressed: () {
-                      Navigator.pushNamed(context, paymentRoute);
+                    Navigator.pushNamed(context, paymentRoute);
                   },
                   backgroundColor: Colors.red,
                 ),
