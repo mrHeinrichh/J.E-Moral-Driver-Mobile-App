@@ -9,6 +9,11 @@ class PickUpPage extends StatelessWidget {
     fontWeight: FontWeight.bold,
     color: Color(0xFF8D9DAE),
   );
+
+  final Map<String, dynamic> transactionData; // Add this line to accept data
+
+  PickUpPage({required this.transactionData}); // Add this constructor
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,17 +26,14 @@ class PickUpPage extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(
-                Icons.menu,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back, // Use the back arrow icon
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.of(context)
+                .pop(); // Navigate back when the button is pressed
           },
         ),
       ),
@@ -41,8 +43,12 @@ class PickUpPage extends StatelessWidget {
             PickedUpCard(
               customTextStyle: customTextStyle,
               buttonText: 'PICKED UP',
-              onPressed: () {},
+              onPressed: () {
+                // Handle the onPressed action in PickUpPage
+                // You can use the transactionData here
+              },
               btncolor: Color(0xFF5E738A),
+              transactionData: transactionData, // Pass data to PickedUpCard
             ),
           ],
         ),

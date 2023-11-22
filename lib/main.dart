@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       routes: {
         loginRoute: (context) => LoginPage(), // Use the imported route
         homeRoute: (context) => HomePage(),
-        pickupRoute: (context) => PickUpPage(),
+        pickupRoute: (context) => PickUpPage(transactionData: {}),
         gpsRoute: (context) => GpsPage(),
         scanDropCancelRoute: (context) => ScanDropCancelPage(),
         scanDropRoute: (context) => ScanDropPage(),

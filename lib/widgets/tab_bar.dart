@@ -1,3 +1,4 @@
+import 'package:driver_app/view/pickup.page.dart';
 import 'package:driver_app/widgets/card_button.dart';
 import 'package:driver_app/widgets/completed_cards.dart';
 import 'package:driver_app/widgets/custom_cards.dart';
@@ -84,7 +85,15 @@ class CustomTabBar extends StatelessWidget {
                           customTextStyle: customTextStyle,
                           buttonText: 'Accept',
                           onPressed: () {
-                            Navigator.pushNamed(context, '/pickup');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PickUpPage(
+                                  transactionData:
+                                      transaction, // Pass transaction data to PickUpPage
+                                ),
+                              ),
+                            );
                           },
                           btncolor: Color(0xFFBD2019),
                           transactionData: transaction,
