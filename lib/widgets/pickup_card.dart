@@ -1,8 +1,7 @@
 import 'dart:io';
-
-import 'package:driver_app/widgets/card_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:driver_app/widgets/card_button.dart';
 
 class PickedUpCard extends StatefulWidget {
   final TextStyle customTextStyle;
@@ -24,9 +23,10 @@ class PickedUpCard extends StatefulWidget {
 }
 
 class _PickedUpCardState extends State<PickedUpCard> {
-  File? _image;
-  bool _imageCaptured = false;
+  File? _image; // Variable to store the picked image
+  bool _imageCaptured = false; // Flag to check if an image is captured
 
+  // Function to get an image from the camera
   Future<void> _getImageFromCamera() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.camera);
@@ -34,27 +34,28 @@ class _PickedUpCardState extends State<PickedUpCard> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
-        _imageCaptured = true; // Image has been captured
+        _imageCaptured = true; // Set the flag to true when an image is captured
       });
     }
   }
 
+  // Function to delete the captured image
   void _deleteImage() {
     setState(() {
       _image = null;
-      _imageCaptured = false;
+      _imageCaptured = false; // Set the flag to false when the image is deleted
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 10, 28, 10),
+      padding: EdgeInsets.fromLTRB(28, 10, 28, 10),
       child: Column(
         children: [
           Card(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
+              padding: EdgeInsets.fromLTRB(25, 25, 25, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -116,86 +117,78 @@ class _PickedUpCardState extends State<PickedUpCard> {
                     "Total Price: ${widget.transactionData['total']}",
                     style: widget.customTextStyle,
                   ),
-
                   GestureDetector(
                     onTap: () {
+                      // Toggle between capturing image and deleting image
                       if (_imageCaptured) {
-                        _deleteImage(); // Handle image deletion
+                        _deleteImage();
                       } else {
-                        _getImageFromCamera(); // Handle the click action
+                        _getImageFromCamera();
                       }
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey, // Set the border color
-                          width: 2.0, // Set the border width
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(8.0), // Set border radius
-                      ),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Icon(
-                              Icons.camera_alt,
-                              color:
-                                  Color(0xFF5E738A), // Set icon color to 5E738A
-                            ),
-                          ),
-                          Positioned(
-                            top: 5,
-                            right: 5,
-                            child: _imageCaptured
-                                ? IconButton(
-                                    onPressed: _deleteImage,
-                                    icon: Icon(
-                                      Icons.close,
-                                      color: Colors.red,
-                                    ),
-                                  )
-                                : SizedBox.shrink(),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Container(
-                              color: Colors.black54,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  _imageCaptured
-                                      ? _image != null
-                                          ? _image!.path.split('/').last
-                                          : 'No Image'
-                                      : '',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                    child: Stack(
+                      children: [
+                        _imageCaptured
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  child: Image.file(
+                                    _image!,
+                                    width: double.infinity,
+                                    height: 100.0,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.camera_alt,
+                                          color: Color(0xFF5E738A),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      width: double.infinity,
-                      height: 150.0, // Adjust the height as needed
+                        Positioned(
+                          top: 5,
+                          right: 5,
+                          child: _imageCaptured
+                              ? IconButton(
+                                  onPressed: _deleteImage,
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                  ),
+                                )
+                              : SizedBox.shrink(),
+                        ),
+                      ],
                     ),
                   ),
-
-                  // Display the captured image
-                  // if (_image != null)
-                  //   Image.file(
-                  //     _image!,
-                  //     width: 100,
-                  //     height: 100,
-                  //   ),
-
                   CardButton(
                     text: widget.buttonText,
                     onPressed: widget.onPressed,
-                    color: _imageCaptured
-                        ? const Color(0xFFBD2019) // Change to BD2019 color
-                        : widget.btncolor, // Use original color
+                    color: _imageCaptured ? Color(0xFFBD2019) : widget.btncolor,
                   ),
                 ],
               ),
