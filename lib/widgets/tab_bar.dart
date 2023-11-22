@@ -79,31 +79,27 @@ class CustomTabBar extends StatelessWidget {
                 SingleChildScrollView(
                   child: Column(
                     children: [
-                      Column(
-                        children: [
-                          for (var transaction in transactions)
-                            CustomCard(
-                              customTextStyle: customTextStyle,
-                              buttonText: 'Accept',
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/pickup');
-                              },
-                              btncolor: Color(0xFFBD2019),
-                              transactionData: transaction,
-                            ),
-                        ],
-                      ),
+                      for (var transaction in transactions)
+                        CustomCard(
+                          customTextStyle: customTextStyle,
+                          buttonText: 'Accept',
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/pickup');
+                          },
+                          btncolor: Color(0xFFBD2019),
+                          transactionData: transaction,
+                        ),
                     ],
                   ),
                 ),
-                Column(
+                ListView(
                   children: [
-                    CompletedCard(
-                      customTextStyle: customTextStyle,
-                    ),
-                    CompletedCard(
-                      customTextStyle: customTextStyle,
-                    ),
+                    for (var transaction in transactions.where(
+                        (transaction) => transaction['completed'] == true))
+                      CompletedCard(
+                        customTextStyle: customTextStyle,
+                        transactionData: transaction,
+                      ),
                   ],
                 ),
                 Center(child: Text('Failed Content')),

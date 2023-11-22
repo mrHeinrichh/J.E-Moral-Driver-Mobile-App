@@ -21,13 +21,13 @@ class GpsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 50.0),
-                spareButton(
-                  text: 'Deliveries',
-                  onPressed: () {
-                    Navigator.pushNamed(context, scanDropCancelRoute);
-                  },
-                  backgroundColor: Colors.red,
-                ),
+                // spareButton(
+                //   text: 'Deliveries',
+                //   onPressed: () {
+                //     Navigator.pushNamed(context, scanDropCancelRoute);
+                //   },
+                //   backgroundColor: Colors.red,
+                // ),
               ],
             ),
           ),

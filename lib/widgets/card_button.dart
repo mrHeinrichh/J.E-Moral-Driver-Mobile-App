@@ -5,8 +5,11 @@ class CardButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color color;
 
-  CardButton(
-      {required this.text, required this.onPressed, required this.color});
+  CardButton({
+    required this.text,
+    required this.onPressed,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,5 @@
 import 'package:driver_app/widgets/completed_cards.dart';
+import 'package:driver_app/widgets/delivery_details.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_cards.dart';
 import '../widgets/card_button.dart';
@@ -48,18 +49,18 @@ class ScanDropPage extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Column(
               children: [
-                spareButton(
-                  text: 'AUTHENTICATE CUSTOMER',
-                  onPressed: () {},
-                  backgroundColor: const Color(0xFF5E738A),
-                ),
-                spareButton(
-                  text: 'DROP OFF',
-                  onPressed: () {
-                    Navigator.pushNamed(context, paymentRoute);
-                  },
-                  backgroundColor: Colors.red,
-                ),
+                // spareButton(
+                //   text: 'AUTHENTICATE CUSTOMER',
+                //   onPressed: () {},
+                //   backgroundColor: const Color(0xFF5E738A),
+                // ),
+                // spareButton(
+                //   text: 'DROP OFF',
+                //   onPressed: () {
+                //     Navigator.pushNamed(context, paymentRoute);
+                //   },
+                //   backgroundColor: Colors.red,
+                // ),
               ],
             ),
           ),

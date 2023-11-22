@@ -51,13 +51,13 @@ class PaymentPage extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Column(
                 children: [
-                  spareButton(
-                    text: 'CONFIRM PAYMENT',
-                    onPressed: () {
-                      // Navigator.pushNamed(context, deliveryRoute);
-                    },
-                    backgroundColor: Colors.red,
-                  ),
+                  // spareButton(
+                  //   text: 'CONFIRM PAYMENT',
+                  //   onPressed: () {
+                  //     // Navigator.pushNamed(context, deliveryRoute);
+                  //   },
+                  //   backgroundColor: Colors.red,
+                  // ),
                 ],
               ),
             ),

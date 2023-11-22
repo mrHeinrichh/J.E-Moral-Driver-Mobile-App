@@ -1,5 +1,6 @@
 import 'package:driver_app/widgets/alert_dialog.dart';
 import 'package:driver_app/widgets/completed_cards.dart';
+import 'package:driver_app/widgets/delivery_details.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_cards.dart';
 import '../widgets/card_button.dart';
@@ -50,34 +51,34 @@ class ScanDropCancelPage extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Column(
                 children: [
-                  spareButton(
-                    text: 'AUTHENTICATE CUSTOMER',
-                    onPressed: () {
-                      Navigator.pushNamed(context, scanDropRoute);
-                    },
-                    backgroundColor: Colors.red,
-                  ),
-                  spareButton(
-                    text: 'DROP OFF',
-                    onPressed: () {
-                      // Navigator.pushNamed(context, deliveryRoute);
-                    },
-                    backgroundColor: Color(0xFF5E738A),
-                  ),
-                  spareButton(
-                    text: 'CANCEL ORDER',
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return CancelOrderDialog(
-                            textField: const TextField(),
-                          );
-                        },
-                      );
-                    },
-                    backgroundColor: Colors.red,
-                  ),
+                  // spareButton(
+                  //   text: 'AUTHENTICATE CUSTOMER',
+                  //   onPressed: () {
+                  //     Navigator.pushNamed(context, scanDropRoute);
+                  //   },
+                  //   backgroundColor: Colors.red,
+                  // ),
+                  // spareButton(
+                  //   text: 'DROP OFF',
+                  //   onPressed: () {
+                  //     // Navigator.pushNamed(context, deliveryRoute);
+                  //   },
+                  //   backgroundColor: Color(0xFF5E738A),
+                  // ),
+                  // spareButton(
+                  //   text: 'CANCEL ORDER',
+                  //   onPressed: () {
+                  //     showDialog(
+                  //       context: context,
+                  //       builder: (BuildContext context) {
+                  //         return CancelOrderDialog(
+                  //           textField: const TextField(),
+                  //         );
+                  //       },
+                  //     );
+                  //   },
+                  //   backgroundColor: Colors.red,
+                  // ),
                 ],
               ),
             ),
