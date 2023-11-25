@@ -1,4 +1,5 @@
 // Import necessary packages
+import 'package:driver_app/view/authenticate_customer.page.dart';
 import 'package:driver_app/view/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         scanDropCancelRoute: (context) => ScanDropCancelPage(),
         scanDropRoute: (context) => ScanDropPage(),
         paymentRoute: (context) => PaymentPage(),
+        authenticateRoute: (context) => AuthenticatePage(transactionData: {}),
       },
     );
   }

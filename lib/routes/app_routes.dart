@@ -5,3 +5,4 @@ final String gpsRoute = '/gps';
 final String scanDropCancelRoute = '/scandropcancel';
 final String scanDropRoute = '/scandrop';
 final String paymentRoute = '/payment';
+final String authenticateRoute = '/authenticate';

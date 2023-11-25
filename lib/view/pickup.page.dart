@@ -1,3 +1,4 @@
+import 'package:driver_app/routes/app_routes.dart';
 import 'package:driver_app/widgets/completed_cards.dart';
 import 'package:driver_app/widgets/custom_cards.dart';
 import 'package:driver_app/widgets/pickup_card.dart';
@@ -44,8 +45,11 @@ class PickUpPage extends StatelessWidget {
               customTextStyle: customTextStyle,
               buttonText: 'PICKED UP',
               onPressed: () {
-                // Handle the onPressed action in PickUpPage
-                // You can use the transactionData here
+                Navigator.pushNamed(
+                  context,
+                  authenticateRoute,
+                  arguments: {'transactionData': transactionData},
+                );
               },
               btncolor: Color(0xFF5E738A),
               transactionData: transactionData, // Pass data to PickedUpCard

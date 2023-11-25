@@ -130,11 +130,9 @@ class _PickedUpCardState extends State<PickedUpCard> {
       "rating": widget.transactionData['rating'],
       "pickupImages": pickupImagePath,
       "completionImages": widget.transactionData['completionImages'],
-      "cancellationImages": widget.transactionData['cancellationImages'],
-      "cancelReason": widget.transactionData['cancelReason'],
       "pickedUp": true,
       "cancelled": widget.transactionData['cancelled'],
-      "completed": true,
+      "completed": false,
       "type": "Online",
     };
 
@@ -233,6 +231,10 @@ class _PickedUpCardState extends State<PickedUpCard> {
                   ),
                   Text(
                     "Total Price: ${widget.transactionData['total']}",
+                    style: widget.customTextStyle,
+                  ),
+                  Text(
+                    "Pick up Images: ${widget.transactionData['pickupImages']}",
                     style: widget.customTextStyle,
                   ),
                   GestureDetector(
