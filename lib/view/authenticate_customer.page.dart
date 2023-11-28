@@ -1,3 +1,4 @@
+import 'package:driver_app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ class AuthenticatePage extends StatefulWidget {
   _AuthenticatePageState createState() => _AuthenticatePageState();
 }
 
-final TextStyle customTextStyle = TextStyle(
+const TextStyle customTextStyle = TextStyle(
   fontSize: 12,
   fontWeight: FontWeight.bold,
   color: Color(0xFF8D9DAE),
@@ -36,8 +37,8 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Scan QR Code'),
-          content: Container(
+          title: const Text('Scan QR Code'),
+          content: SizedBox(
             width: double.infinity,
             height: 300,
             child: QRView(
@@ -80,14 +81,14 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Success!'),
-          content: Text('QR Code matches transaction ID.'),
+          title: const Text('Success!'),
+          content: const Text('QR Code matches transaction ID.'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -203,7 +204,7 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
         backgroundColor: Colors.white,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.black,
           ),
@@ -212,87 +213,93 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
           },
         ),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            DropOffCard(
-              customTextStyle: customTextStyle,
-              buttonText: 'Disregard this',
-              onPressed: () {},
-              btncolor: Color(0xFF5E738A),
-              transactionData: transactionData,
-            ),
-            SpareButton(
-              text: 'AUTHENTICATE CUSTOMER',
-              onPressed: isScanningSuccessful
-                  ? null
-                  : () {
-                      _startQRScanner(context, transactionData);
-                    } as VoidCallback?,
-              backgroundColor:
-                  isScanningSuccessful ? Color(0xFF837E7E) : Color(0xFFBD2019),
-            ),
-            SpareButton(
-              text: 'DROP OFF',
-              onPressed: () {},
-              backgroundColor:
-                  isScanningSuccessful ? Color(0xFFBD2019) : Color(0xFF837E7E),
-            ),
-            SpareButton(
-              text: 'CANCEL ORDER',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    File? capturedImage;
+      body: Column(
+        children: [
+          DropOffCard(
+            customTextStyle: customTextStyle,
+            buttonText: 'Disregard this',
+            onPressed: () {},
+            btncolor: const Color(0xFF5E738A),
+            transactionData: transactionData,
+          ),
+          SpareButton(
+            text: 'AUTHENTICATE CUSTOMER',
+            onPressed: isScanningSuccessful
+                ? null
+                : () {
+                    _startQRScanner(context, transactionData);
+                  } as VoidCallback?,
+            backgroundColor: isScanningSuccessful
+                ? const Color(0xFF837E7E)
+                : const Color(0xFFBD2019),
+          ),
+          SpareButton(
+            text: 'DROP OFF',
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                dropOffRoute,
+                arguments: {'transactionData': transactionData},
+              );
+            },
+            backgroundColor: isScanningSuccessful
+                ? const Color(0xFFBD2019)
+                : const Color(0xFF837E7E),
+          ),
+          SpareButton(
+            text: 'CANCEL ORDER',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  File? capturedImage;
 
-                    return AlertDialog(
-                      title: Text('Cancel Order'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              final pickedFile = await ImagePicker()
-                                  .pickImage(source: ImageSource.camera);
-
-                              if (pickedFile != null) {
-                                capturedImage = File(pickedFile.path);
-                              }
-                            },
-                            child: Text('Capture Image'),
-                          ),
-                          TextField(
-                            controller: cancelReasonController,
-                            decoration:
-                                InputDecoration(labelText: 'Enter reason'),
-                          ),
-                        ],
-                      ),
-                      actions: [
+                  return AlertDialog(
+                    title: const Text('Cancel Order'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         ElevatedButton(
                           onPressed: () async {
-                            if (capturedImage != null) {
-                              String cancelImagepath =
-                                  await _uploadImage(capturedImage!);
-                              String cancelReason = cancelReasonController.text;
-                              _updateTransaction(transactionData['_id'],
-                                  cancelImagepath, cancelReason);
+                            final pickedFile = await ImagePicker()
+                                .pickImage(source: ImageSource.camera);
 
-                              Navigator.pop(context);
+                            if (pickedFile != null) {
+                              capturedImage = File(pickedFile.path);
                             }
                           },
-                          child: Text('Submit'),
+                          child: const Text('Capture Image'),
+                        ),
+                        TextField(
+                          controller: cancelReasonController,
+                          decoration:
+                              const InputDecoration(labelText: 'Enter reason'),
                         ),
                       ],
-                    );
-                  },
-                );
-              },
-              backgroundColor: Color(0xFFBD2019),
-            ),
-          ],
-        ),
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (capturedImage != null) {
+                            String cancelImagepath =
+                                await _uploadImage(capturedImage!);
+                            String cancelReason = cancelReasonController.text;
+                            _updateTransaction(transactionData['_id'],
+                                cancelImagepath, cancelReason);
+
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: const Text('Submit'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            backgroundColor: const Color(0xFFBD2019),
+          ),
+        ],
       ),
     );
   }

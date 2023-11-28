@@ -49,20 +49,20 @@ class ConfirmPickupDialog extends StatelessWidget {
                   child: Text('No, I haven\'t.'),
                 ),
                 const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.pushNamed(context, gpsRoute);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Background color of button
-                    onPrimary: Colors.white, // Text color of button
-                    side: BorderSide(
-                        color: Colors.red,
-                        width: 2), // Outer line color and width
-                  ),
-                  child: Text('Yes, I have.'),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.of(context).pop();
+                //     Navigator.pushNamed(context, gpsRoute);
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     primary: Colors.red, // Background color of button
+                //     onPrimary: Colors.white, // Text color of button
+                //     side: BorderSide(
+                //         color: Colors.red,
+                //         width: 2), // Outer line color and width
+                //   ),
+                //   child: Text('Yes, I have.'),
+                // ),
               ],
             ),
           ],

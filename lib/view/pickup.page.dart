@@ -1,11 +1,9 @@
 import 'package:driver_app/routes/app_routes.dart';
-import 'package:driver_app/widgets/completed_cards.dart';
-import 'package:driver_app/widgets/custom_cards.dart';
 import 'package:driver_app/widgets/pickup_card.dart';
 import 'package:flutter/material.dart';
 
 class PickUpPage extends StatelessWidget {
-  final TextStyle customTextStyle = TextStyle(
+  final TextStyle customTextStyle = const TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.bold,
     color: Color(0xFF8D9DAE),
@@ -28,7 +26,7 @@ class PickUpPage extends StatelessWidget {
         backgroundColor: Colors.white,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back, // Use the back arrow icon
             color: Colors.black,
           ),
@@ -38,24 +36,22 @@ class PickUpPage extends StatelessWidget {
           },
         ),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            PickedUpCard(
-              customTextStyle: customTextStyle,
-              buttonText: 'PICKED UP',
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  authenticateRoute,
-                  arguments: {'transactionData': transactionData},
-                );
-              },
-              btncolor: Color(0xFF5E738A),
-              transactionData: transactionData, // Pass data to PickedUpCard
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          PickedUpCard(
+            customTextStyle: customTextStyle,
+            buttonText: 'PICKED UP',
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                authenticateRoute,
+                arguments: {'transactionData': transactionData},
+              );
+            },
+            btncolor: const Color(0xFF5E738A),
+            transactionData: transactionData, // Pass data to PickedUpCard
+          ),
+        ],
       ),
     );
   }

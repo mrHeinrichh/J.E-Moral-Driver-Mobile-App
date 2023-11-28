@@ -1,8 +1,8 @@
-final String loginRoute = '/login';
-final String homeRoute = '/home';
-final String pickupRoute = '/pickup';
-final String gpsRoute = '/gps';
-final String scanDropCancelRoute = '/scandropcancel';
-final String scanDropRoute = '/scandrop';
-final String paymentRoute = '/payment';
-final String authenticateRoute = '/authenticate';
+const String loginRoute = '/login';
+const String homeRoute = '/home';
+const String pickupRoute = '/pickup';
+const String dropOffRoute = '/dropoff';
+const String scanDropCancelRoute = '/scandropcancel';
+const String scanDropRoute = '/scandrop';
+const String paymentRoute = '/payment';
+const String authenticateRoute = '/authenticate';

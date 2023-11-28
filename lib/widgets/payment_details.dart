@@ -16,7 +16,7 @@ class PickupDetails extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Pickup Details",
             style: TextStyle(
               fontSize: 14,
@@ -94,12 +94,12 @@ class DriverInformation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 10, 28, 10),
+      padding: const EdgeInsets.fromLTRB(28, 5, 28, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Gcash Driver Information",
+          const Text(
+            "E-Wallet Driver Information",
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -116,7 +116,7 @@ class DriverInformation extends StatelessWidget {
                   Row(
                     children: [
                       Image.network(
-                        'https://raw.githubusercontent.com/WatchingDino/Magat-CSPT/3f2d40b7b6038876a256c9f07746c9315ee2e42a/assets/img/aiPlatforms/AIPlatforms.jpg',
+                        'https://raw.githubusercontent.com/mrHeinrichh/J.E-Moral-cdn/main/assets/gcash-example.png',
                         width: 90,
                         height: 90,
                       ),
@@ -125,36 +125,11 @@ class DriverInformation extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Delivery No.:",
+                            "Gcash Name: John Heinrich Fabros",
                             style: customTextStyle,
                           ),
-                          const SizedBox(height: 10),
                           Text(
-                            "Product List:",
-                            style: customTextStyle,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Image.network(
-                        'https://raw.githubusercontent.com/WatchingDino/Magat-CSPT/3f2d40b7b6038876a256c9f07746c9315ee2e42a/assets/img/aiPlatforms/AIPlatforms.jpg',
-                        width: 90,
-                        height: 90,
-                      ),
-                      const SizedBox(width: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Delivery No.:",
-                            style: customTextStyle,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            "Product List:",
+                            "Gcash Number: 0956 974 9935",
                             style: customTextStyle,
                           ),
                         ],
