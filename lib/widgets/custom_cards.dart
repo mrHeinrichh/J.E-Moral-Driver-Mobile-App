@@ -20,12 +20,13 @@ class CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isApproved = transactionData['isApproved'];
 
+    bool isCompleted = transactionData['completed'];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
         children: [
           Visibility(
-            visible: isApproved, // Set visibility based on isApproved
+            visible: isApproved && !isCompleted,
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),

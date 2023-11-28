@@ -30,7 +30,7 @@ class CustomTabBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: TabBar(
-                isScrollable: true,
+                isScrollable: false,
                 tabs: [
                   Container(
                     height: 30,
