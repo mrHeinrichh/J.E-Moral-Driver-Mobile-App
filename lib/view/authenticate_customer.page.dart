@@ -1,23 +1,99 @@
+import 'package:flutter/material.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:driver_app/widgets/card_button.dart';
 import 'package:driver_app/widgets/drop_off_card.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 
-class AuthenticatePage extends StatelessWidget {
-  final TextStyle customTextStyle = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.bold,
-    color: Color(0xFF8D9DAE),
-  );
-
+class AuthenticatePage extends StatefulWidget {
   final Map<String, dynamic> transactionData;
 
   AuthenticatePage({required this.transactionData});
+
+  @override
+  _AuthenticatePageState createState() => _AuthenticatePageState();
+}
+
+final TextStyle customTextStyle = TextStyle(
+  fontSize: 12,
+  fontWeight: FontWeight.bold,
+  color: Color(0xFF8D9DAE),
+);
+
+class _AuthenticatePageState extends State<AuthenticatePage> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  late QRViewController controller;
+  bool isScanningSuccessful = false;
+
+  Future<void> _startQRScanner(
+      BuildContext context, Map<String, dynamic> transactionData) async {
+    print('Transaction ID: ${transactionData['_id']}');
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Scan QR Code'),
+          content: Container(
+            width: double.infinity,
+            height: 300,
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: (QRViewController controller) {
+                this.controller = controller;
+                controller.scannedDataStream.listen((scanData) {
+                  if (scanData != null && scanData.code != null) {
+                    String scannedCode = scanData.code ?? '';
+                    scannedCode = scannedCode.trim();
+                    print('Scanned QR Code: $scannedCode');
+
+                    String transactionId = transactionData['_id']?.trim() ?? '';
+                    print('Transaction ID: $transactionId');
+
+                    if (scannedCode == transactionId) {
+                      Navigator.pop(context);
+                      _showSuccessDialog(context);
+                      setState(() {
+                        isScanningSuccessful = true;
+                      });
+                    } else {
+                      print('QR Code does not match transaction ID.');
+                      setState(() {
+                        isScanningSuccessful = false;
+                      });
+                    }
+                  }
+                });
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success!'),
+          content: Text('QR Code matches transaction ID.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<String> _uploadImage(File imageFile) async {
     try {
@@ -60,23 +136,22 @@ class AuthenticatePage extends StatelessWidget {
         var decodedResponse = json.decode(responseBody);
         print('Upload success: $decodedResponse');
 
-        // Extract the path from the response
         String cancelImagepath = decodedResponse['data'][0]['path'];
 
-        return cancelImagepath; // Return the cancelImagepath
+        return cancelImagepath;
       } else {
         print('Upload failed with status ${response.statusCode}');
-        return ''; // Handle failure appropriately
+        return '';
       }
     } catch (error) {
       print('Error uploading image: $error');
-      return ''; // Handle error appropriately
+      return '';
     }
   }
 
- Future<void> _updateTransaction(
-    String transactionId, String cancelImagepath, String cancelReason) async {
-     final String apiUrl =
+  Future<void> _updateTransaction(
+      String transactionId, String cancelImagepath, String cancelReason) async {
+    final String apiUrl =
         'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
 
     Map<String, dynamic> updateData = {
@@ -113,7 +188,9 @@ class AuthenticatePage extends StatelessWidget {
     Map<String, dynamic> args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     Map<String, dynamic> transactionData = args['transactionData'];
-final TextEditingController cancelReasonController = TextEditingController();
+    final TextEditingController cancelReasonController =
+        TextEditingController();
+    print('Transaction ID: ${transactionData['_id']}');
 
     return Scaffold(
       appBar: AppBar(
@@ -140,25 +217,28 @@ final TextEditingController cancelReasonController = TextEditingController();
           children: [
             DropOffCard(
               customTextStyle: customTextStyle,
-              buttonText: 'Authenticate Customer',
-              onPressed: () {
-                // Handle the onPressed action in AuthenticatePage
-                // You can use the transactionData here
-              },
+              buttonText: 'Disregard this',
+              onPressed: () {},
               btncolor: Color(0xFF5E738A),
               transactionData: transactionData,
             ),
-            spareButton(
+            SpareButton(
               text: 'AUTHENTICATE CUSTOMER',
-              onPressed: () {},
-              backgroundColor: Color(0xFFBD2019),
+              onPressed: isScanningSuccessful
+                  ? null
+                  : () {
+                      _startQRScanner(context, transactionData);
+                    } as VoidCallback?,
+              backgroundColor:
+                  isScanningSuccessful ? Color(0xFF837E7E) : Color(0xFFBD2019),
             ),
-            spareButton(
+            SpareButton(
               text: 'DROP OFF',
               onPressed: () {},
-              backgroundColor: Color(0xFF837E7E),
+              backgroundColor:
+                  isScanningSuccessful ? Color(0xFFBD2019) : Color(0xFF837E7E),
             ),
-            spareButton(
+            SpareButton(
               text: 'CANCEL ORDER',
               onPressed: () {
                 showDialog(
@@ -195,8 +275,9 @@ final TextEditingController cancelReasonController = TextEditingController();
                             if (capturedImage != null) {
                               String cancelImagepath =
                                   await _uploadImage(capturedImage!);
-  String cancelReason = cancelReasonController.text;
-                           _updateTransaction(transactionData['_id'], cancelImagepath, cancelReason);
+                              String cancelReason = cancelReasonController.text;
+                              _updateTransaction(transactionData['_id'],
+                                  cancelImagepath, cancelReason);
 
                               Navigator.pop(context);
                             }

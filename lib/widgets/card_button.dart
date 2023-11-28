@@ -27,12 +27,12 @@ class CardButton extends StatelessWidget {
   }
 }
 
-class spareButton extends StatelessWidget {
+class SpareButton extends StatelessWidget {
   final String text;
-  final Function onPressed;
+  final VoidCallback? onPressed;
   final Color backgroundColor;
 
-  spareButton({
+  SpareButton({
     required this.text,
     required this.onPressed,
     required this.backgroundColor,
@@ -43,11 +43,11 @@ class spareButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 20.0),
       child: ElevatedButton(
-        onPressed: onPressed as void Function()?,
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 60.0),
-          primary: backgroundColor, // Button color
-          onPrimary: Colors.white, // Text color inside the button
+          primary: backgroundColor,
+          onPrimary: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
