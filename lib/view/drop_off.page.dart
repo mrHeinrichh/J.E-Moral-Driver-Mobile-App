@@ -200,6 +200,7 @@ class _DropOffPageState extends State<DropOffPage> {
         title: const Text('Drop Off Payment'),
         backgroundColor: Colors.white,
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Column(

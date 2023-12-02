@@ -203,15 +203,7 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [

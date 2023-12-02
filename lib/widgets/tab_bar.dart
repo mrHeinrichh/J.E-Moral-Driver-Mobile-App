@@ -3,6 +3,8 @@ import 'package:driver_app/widgets/card_button.dart';
 import 'package:driver_app/widgets/completed_cards.dart';
 import 'package:driver_app/widgets/custom_cards.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class CustomTabBar extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
@@ -14,6 +16,28 @@ class CustomTabBar extends StatelessWidget {
     fontWeight: FontWeight.bold,
     color: Color(0xFF8D9DAE),
   );
+  Future<void> updateTransactionStatus(String transactionId) async {
+    final Uri url = Uri.parse(
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId');
+    final Map<String, dynamic> requestBody = {
+      'pickedUp': true,
+      "rider": '$transactionId'
+    };
+
+    final response = await http.patch(
+      url,
+      body: json.encode(requestBody),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Transaction status updated successfully');
+      print(response.body);
+      print(response.statusCode);
+    } else {
+      print('Failed to update transaction status');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,16 +108,27 @@ class CustomTabBar extends StatelessWidget {
                         CustomCard(
                           customTextStyle: customTextStyle,
                           buttonText: 'Accept',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PickUpPage(
-                                  transactionData:
-                                      transaction, // Pass transaction data to PickUpPage
+                          onPressed: () async {
+                            // Retrieve the transaction ID
+                            String? transactionId = transaction['_id'];
+
+                            if (transactionId != null) {
+                              // Call the function to update the transaction status
+                              await updateTransactionStatus(transactionId);
+
+                              // Optionally, you can update the local state
+                              // to reflect the change (set "pickedUp" to true)
+
+                              // Navigate to the PickUpPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PickUpPage(
+                                    transactionData: transaction,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           },
                           btncolor: Color(0xFFBD2019),
                           transactionData: transaction,

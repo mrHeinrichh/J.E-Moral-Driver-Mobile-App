@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:driver_app/widgets/card_button.dart';
 
@@ -20,13 +22,15 @@ class CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isApproved = transactionData['isApproved'];
 
+    bool pickedUp = transactionData['pickedUp'];
+
     bool isCompleted = transactionData['completed'];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
         children: [
           Visibility(
-            visible: isApproved && !isCompleted,
+            visible: isApproved && !isCompleted && !pickedUp,
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),

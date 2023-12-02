@@ -17,6 +17,7 @@ class ScanDropCancelPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Deliveries',
           style: TextStyle(
@@ -25,19 +26,6 @@ class ScanDropCancelPage extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(
-                Icons.menu,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
       ),
       body: Container(
         child: Column(

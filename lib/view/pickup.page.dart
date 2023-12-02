@@ -17,6 +17,7 @@ class PickUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Pick Up Deliveries',
           style: TextStyle(
@@ -25,16 +26,6 @@ class PickUpPage extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back, // Use the back arrow icon
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.of(context)
-                .pop(); // Navigate back when the button is pressed
-          },
-        ),
       ),
       body: Column(
         children: [
