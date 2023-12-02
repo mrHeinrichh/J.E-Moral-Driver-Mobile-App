@@ -235,13 +235,15 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
           ),
           SpareButton(
             text: 'DROP OFF',
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                dropOffRoute,
-                arguments: {'transactionData': transactionData},
-              );
-            },
+            onPressed: isScanningSuccessful
+                ? () {
+                    Navigator.pushNamed(
+                      context,
+                      dropOffRoute,
+                      arguments: {'transactionData': transactionData},
+                    );
+                  }
+                : null,
             backgroundColor: isScanningSuccessful
                 ? const Color(0xFFBD2019)
                 : const Color(0xFF837E7E),

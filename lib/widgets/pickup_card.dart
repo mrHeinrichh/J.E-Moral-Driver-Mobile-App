@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/services.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class PickedUpCard extends StatefulWidget {
   final TextStyle customTextStyle;
@@ -31,6 +32,7 @@ class PickedUpCard extends StatefulWidget {
 class _PickedUpCardState extends State<PickedUpCard> {
   File? _image;
   bool _imageCaptured = false;
+  bool _googleMapsLaunched = false; // Add this flag
 
   Future<void> _getImageFromCamera() async {
     final pickedFile =
@@ -41,6 +43,28 @@ class _PickedUpCardState extends State<PickedUpCard> {
         _image = File(pickedFile.path);
         _imageCaptured = true;
       });
+    }
+  }
+
+  Future<void> _launchGoogleMaps(double latitude, double longitude) async {
+    try {
+      if (!_googleMapsLaunched) {
+        // Check the flag
+        _googleMapsLaunched = true; // Set the flag to true
+        await MapsLauncher.launchCoordinates(latitude, longitude);
+
+        // Launch was successful, call _updateTransaction
+        await _updateTransaction(
+          widget.transactionData['_id'],
+          widget.transactionData['pickupImages'],
+        );
+
+        if (widget.onPressed != null) {
+          widget.onPressed();
+        }
+      }
+    } catch (e) {
+      print('Error launching Google Maps: $e');
     }
   }
 
@@ -108,54 +132,102 @@ class _PickedUpCardState extends State<PickedUpCard> {
 
   Future<void> _updateTransaction(
       String transactionId, String pickupImagePath) async {
-    final String apiUrl =
-        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
-
-    Map<String, dynamic> updateData = {
-      "deliveryLocation": widget.transactionData['deliveryLocation'],
-      "name": widget.transactionData['name'],
-      "contactNumber": widget.transactionData['contactNumber'],
-      "houseLotBlk": widget.transactionData['houseLotBlk'],
-      "barangay": widget.transactionData['barangay'],
-      "paymentMethod": widget.transactionData['paymentMethod'],
-      "assembly": widget.transactionData['assembly'],
-      "isApproved": widget.transactionData['isApproved'],
-      "deliveryTime": widget.transactionData['deliveryTime'],
-      "total": widget.transactionData['total'],
-      "items": widget.transactionData['items'],
-      "customer": widget.transactionData['customer'],
-      "rider": widget.transactionData['rider'],
-      "hasFeedback": widget.transactionData['hasFeedback'],
-      "feedback": widget.transactionData['feedback'],
-      "rating": widget.transactionData['rating'],
-      "pickupImages": pickupImagePath,
-      "completionImages": widget.transactionData['completionImages'],
-      "pickedUp": true,
-      "cancelled": widget.transactionData['cancelled'],
-      "completed": false,
-      "type": "Online",
-    };
-
     try {
-      final http.Response response = await http.patch(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(updateData),
-      );
+      // Geocode the delivery location to get latitude and longitude
+      String deliveryLocation = widget.transactionData['deliveryLocation'];
+      List<double> coordinates = await _geocodeAddress(deliveryLocation);
 
-      if (response.statusCode == 200) {
-        print('Transaction updated successfully');
-        print('Response: ${response.body}');
-        print(response.statusCode);
+      if (coordinates.isNotEmpty) {
+        double deliveryLocationLatitude = coordinates[0];
+        double deliveryLocationLongitude = coordinates[1];
+
+        // Update the transaction data
+        Map<String, dynamic> updateData = {
+          "deliveryLocation": widget.transactionData['deliveryLocation'],
+          "name": widget.transactionData['name'],
+          "contactNumber": widget.transactionData['contactNumber'],
+          "houseLotBlk": widget.transactionData['houseLotBlk'],
+          "barangay": widget.transactionData['barangay'],
+          "paymentMethod": widget.transactionData['paymentMethod'],
+          "assembly": widget.transactionData['assembly'],
+          "isApproved": widget.transactionData['isApproved'],
+          "deliveryTime": widget.transactionData['deliveryTime'],
+          "total": widget.transactionData['total'],
+          "items": widget.transactionData['items'],
+          "customer": widget.transactionData['customer'],
+          "rider": widget.transactionData['rider'],
+          "hasFeedback": widget.transactionData['hasFeedback'],
+          "feedback": widget.transactionData['feedback'],
+          "rating": widget.transactionData['rating'],
+          "pickupImages": pickupImagePath,
+          "completionImages": widget.transactionData['completionImages'],
+          "pickedUp": true,
+          "cancelled": widget.transactionData['cancelled'],
+          "completed": false,
+          "type": "Online",
+        };
+
+        // Patch request to update the transaction
+        final String apiUrl =
+            'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
+        final http.Response response = await http.patch(
+          Uri.parse(apiUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(updateData),
+        );
+        if (response.statusCode == 200) {
+          print('Transaction updated successfully');
+          print('Response: ${response.body}');
+          print(response.statusCode);
+
+          // Launch Google Maps with the obtained coordinates
+          await _launchGoogleMaps(
+              deliveryLocationLatitude, deliveryLocationLongitude);
+
+          if (widget.onPressed != null) {
+            widget.onPressed();
+          }
+        } else {
+          print(
+              'Failed to update transaction. Status code: ${response.statusCode}');
+          print('Response: ${response.body}');
+        }
       } else {
-        print(
-            'Failed to update transaction. Status code: ${response.statusCode}');
-        print('Response: ${response.body}');
+        print('Failed to geocode address.');
       }
     } catch (error) {
       print('Error updating transaction: $error');
+    }
+  }
+
+  Future<List<double>> _geocodeAddress(String address) async {
+    final apiKey = '397b2724db1f4de58cf440e681d855bc';
+    final apiUrl = Uri.parse('https://api.geoapify.com/v1/geocode/search');
+    final text = Uri.encodeComponent(address);
+
+    final url = Uri(
+      scheme: apiUrl.scheme,
+      host: apiUrl.host,
+      path: apiUrl.path,
+      query: 'text=$text&apiKey=$apiKey',
+    );
+
+    try {
+      final response = await http.get(url);
+      final data = json.decode(response.body);
+
+      if (data['features'] != null && data['features'].isNotEmpty) {
+        final location = data['features'][0]['geometry']['coordinates'];
+        double latitude = location[1];
+        double longitude = location[0];
+        return [latitude, longitude];
+      } else {
+        print('Geocoding failed. No coordinates found.');
+        return [];
+      }
+    } catch (error) {
+      print('Error during geocoding: $error');
+      return [];
     }
   }
 

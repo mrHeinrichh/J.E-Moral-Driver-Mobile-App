@@ -3,9 +3,12 @@
 <plist version="1.0">
 <dict>
 <key>NSCameraUsageDescription</key>
+
 <string>Allow camera access for image capture</string>
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Allow access to your photo library</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Your location is needed for...</string>
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
