@@ -50,6 +50,19 @@ class _HomePageState extends State<HomePage> {
             color: Colors.black,
           ),
         ),
+        actions: [
+          // Add a refresh icon button
+          IconButton(
+            icon: const Icon(
+              Icons.refresh,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              // Call the fetchData method to refresh data
+              fetchData();
+            },
+          ),
+        ],
         backgroundColor: Colors.white,
         centerTitle: true,
         leading: Builder(

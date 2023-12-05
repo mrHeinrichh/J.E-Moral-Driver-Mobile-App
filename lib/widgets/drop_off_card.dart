@@ -76,11 +76,11 @@ class _DropOffCardState extends State<DropOffCard> {
                     style: widget.customTextStyle,
                   ),
                   Text(
-                    "Receiver Name: ${widget.transactionData['receiverName']}",
+                    "Receiver Name: ${widget.transactionData['name']}",
                     style: widget.customTextStyle,
                   ),
                   Text(
-                    "Receiver Contact: ${widget.transactionData['receiverContact']}",
+                    "Receiver Contact: ${widget.transactionData['contactNumber']}",
                     style: widget.customTextStyle,
                   ),
                   Text(

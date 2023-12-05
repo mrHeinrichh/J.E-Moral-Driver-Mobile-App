@@ -201,6 +201,18 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
             color: Colors.black,
           ),
         ),
+        actions: [
+          // Add a refresh icon button
+          IconButton(
+            icon: const Icon(
+              Icons.refresh,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              setState(() {});
+            },
+          ),
+        ],
         backgroundColor: Colors.white,
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -282,6 +294,7 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                                 cancelImagepath, cancelReason);
 
                             Navigator.pop(context);
+                            Navigator.pushNamed(context, homeRoute);
                           }
                         },
                         child: const Text('Submit'),
