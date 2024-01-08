@@ -10,7 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Map<String, dynamic>> transactions;
+  late List<Map<String, dynamic>> transactions = [];
 
   @override
   void initState() {
@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
       drawer: CustomDrawer(),
       body: transactions == null
           ? Center(child: CircularProgressIndicator())
-          : CustomTabBar(transactions: transactions),
+          : CustomTabBar(transactions: transactions!),
     );
   }
 }

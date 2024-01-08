@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                 print('User Details: $userDetailsData');
 
                 // Extract "type" field from user details
-                String userType = userDetailsData['data']['__t'] ?? '';
+                String userType = userDetailsData['data']['user']['__t'] ?? '';
 
                 print('User Type: $userType');
 
