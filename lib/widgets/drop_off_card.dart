@@ -1,13 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:driver_app/widgets/card_button.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'package:http_parser/http_parser.dart';
-import 'package:flutter/services.dart';
+import 'dart:math' as Math;
 
 class DropOffCard extends StatefulWidget {
   final TextStyle customTextStyle;
@@ -29,6 +27,127 @@ class DropOffCard extends StatefulWidget {
 }
 
 class _DropOffCardState extends State<DropOffCard> {
+  Map<String, dynamic>? _fetchedTransactionData;
+  late Timer _timer; // Timer for periodic fetching
+  final Geolocator _geolocator = Geolocator();
+  late double latitude;
+  late double longitude;
+  late LocationPermission locationPermission = LocationPermission.denied;
+
+  late StreamSubscription<Position> _positionStream;
+  bool _fetchSuccess = false; // Track if the data fetch is successful
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTransactionData();
+    // Set up a timer to fetch location every 2 seconds
+    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      if (_fetchSuccess) {
+        // Only fetch location if data fetch is successful
+        _getCurrentLocation();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _positionStream.cancel();
+    super.dispose();
+  }
+
+  void _getCurrentLocation() async {
+    try {
+      // No need to check if locationPermission is null here
+      // because it's initialized in the initState method
+
+      // If locationPermission is denied, request permission
+      if (locationPermission == LocationPermission.denied) {
+        locationPermission = await Geolocator.requestPermission();
+        if (locationPermission == LocationPermission.denied) {
+          print('User denied permissions to access the device\'s location.');
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+      });
+
+      print('Latitude: $latitude, Longitude: $longitude');
+      _updateApi();
+    } catch (e) {
+      print('Error getting current location: $e');
+    }
+  }
+
+  Future<void> fetchTransactionData() async {
+    if (!mounted) {
+      return;
+    }
+
+    final String transactionId = widget.transactionData['_id'];
+    final String apiUrl =
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        // Successful response, parse and set the data
+        final responseData = json.decode(response.body);
+        setState(() {
+          _fetchedTransactionData = responseData['data'];
+          _fetchSuccess = true; // Set the success flag to true
+        });
+      } else {
+        // Handle error if the request was not successful
+        print(
+            'Failed to fetch transaction data. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle network or other errors
+      print('Error during transaction data fetching: $error');
+    }
+  }
+
+  Future<void> _updateApi() async {
+    if (_fetchedTransactionData == null) {
+      return;
+    }
+
+    final String transactionId = _fetchedTransactionData!['_id'];
+    final apiUrl =
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
+
+    try {
+      final response = await http.patch(
+        Uri.parse(apiUrl),
+        body: {
+          'lat': latitude.toString(),
+          'long': longitude.toString(),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        fetchTransactionData();
+        print(
+            'Transaction Updated: Latitude: $latitude, Longitude: $longitude');
+      } else {
+        print(
+            'Failed to update transaction. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error updating transaction: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -38,85 +157,69 @@ class _DropOffCardState extends State<DropOffCard> {
           Card(
             child: Padding(
               padding: EdgeInsets.fromLTRB(25, 25, 25, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Transaction id: ${widget.transactionData['_id']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Barangay: ${widget.transactionData['barangay']}",
-                        style: widget.customTextStyle,
-                      ),
-                      SizedBox(width: 50),
-                      Text(
-                        "Status Approval: ${widget.transactionData['isApproved']}",
-                        style: widget.customTextStyle,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "House#/Lot/Blk: ${widget.transactionData['houseLotBlk']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Address: ${widget.transactionData['deliveryLocation']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Booker Name: ${widget.transactionData['name']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Booker Contact: ${widget.transactionData['contactNumber']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Receiver Name: ${widget.transactionData['name']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Receiver Contact: ${widget.transactionData['contactNumber']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Payment Method: ${widget.transactionData['paymentMethod']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Needs to be assembled: ${widget.transactionData['assembly']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Delivery Time: ${widget.transactionData['deliveryTime']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Product List: ${widget.transactionData['items']?.toString() ?? 'N/A'}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Total Price: ${widget.transactionData['total']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Pick up Images: ${widget.transactionData['pickupImages']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "CancellationImages: ${widget.transactionData['cancellationImages']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Cancel Reason: ${widget.transactionData['cancelReason']?.toString()}",
-                    style: widget.customTextStyle,
-                  ),
-                ],
-              ),
+              child: _fetchedTransactionData != null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Display fetched transaction data here
+                        Text(
+                          "Transaction id: ${_fetchedTransactionData!['_id']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Barangay: ${_fetchedTransactionData!['barangay']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Houst#/Lot/Blk: ${_fetchedTransactionData!['houseLotBlk']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Address: ${_fetchedTransactionData!['deliveryLocation']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Booker Name: ${_fetchedTransactionData!['name']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Booker Contact: ${_fetchedTransactionData!['contactNumber']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Booker Contact: ${_fetchedTransactionData!['contactNumber']}",
+                          style: widget.customTextStyle,
+                        ),
+
+                        Text(
+                          "Payment Method: ${_fetchedTransactionData!['paymentMethod']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Needs to be Assmbled?: ${_fetchedTransactionData!['assembly']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Product List?: ${_fetchedTransactionData!['items']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "Total Price?: ${_fetchedTransactionData!['total']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "lat: ${_fetchedTransactionData!['lat']}",
+                          style: widget.customTextStyle,
+                        ),
+                        Text(
+                          "long: ${_fetchedTransactionData!['long']}",
+                          style: widget.customTextStyle,
+                        ),
+                      ],
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
             ),
           ),
         ],

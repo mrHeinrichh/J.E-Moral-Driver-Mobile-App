@@ -191,7 +191,6 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
     Map<String, dynamic> transactionData = args['transactionData'];
     final TextEditingController cancelReasonController =
         TextEditingController();
-    print('Transaction ID: ${transactionData['_id']}');
 
     return Scaffold(
       appBar: AppBar(

@@ -155,7 +155,6 @@ class _PickedUpCardState extends State<PickedUpCard> {
           "total": widget.transactionData['total'],
           "items": widget.transactionData['items'],
           "customer": widget.transactionData['customer'],
-          "rider": widget.transactionData['rider'],
           "hasFeedback": widget.transactionData['hasFeedback'],
           "feedback": widget.transactionData['feedback'],
           "rating": widget.transactionData['rating'],
@@ -233,6 +232,8 @@ class _PickedUpCardState extends State<PickedUpCard> {
 
   @override
   Widget build(BuildContext context) {
+    print('Transaction Data: ${widget.transactionData['rider']}');
+
     return Padding(
       padding: EdgeInsets.fromLTRB(28, 10, 28, 10),
       child: Column(
@@ -303,6 +304,10 @@ class _PickedUpCardState extends State<PickedUpCard> {
                   ),
                   Text(
                     "Total Price: ${widget.transactionData['total']}",
+                    style: widget.customTextStyle,
+                  ),
+                  Text(
+                    "rider: ${widget.transactionData['rider']}",
                     style: widget.customTextStyle,
                   ),
                   Text(
