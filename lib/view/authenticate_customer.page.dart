@@ -159,6 +159,7 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
       "cancellationImages": cancelImagepath,
       "cancelReason": cancelReason,
       "completed": false,
+      "active": false,
     };
 
     try {

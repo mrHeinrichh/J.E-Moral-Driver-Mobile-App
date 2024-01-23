@@ -51,6 +51,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
       if (!_googleMapsLaunched) {
         // Check the flag
         _googleMapsLaunched = true; // Set the flag to true
+        await Future.delayed(Duration(seconds: 5));
         await MapsLauncher.launchCoordinates(latitude, longitude);
 
         // Launch was successful, call _updateTransaction
@@ -164,6 +165,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
           "cancelled": widget.transactionData['cancelled'],
           "completed": false,
           "type": "Online",
+          "active": true,
         };
 
         // Patch request to update the transaction

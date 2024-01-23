@@ -1,12 +1,18 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.7.22' // Updated Kotlin version
+    ext {
+        compileSdkVersion = 33     // Added Android SDK versions
+        targetSdkVersion = 33
+        appCompatVersion = "1.5.1" // Added AppCompat version
+    }
+
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.android.tools.build:gradle:7.4.1' // Updated Gradle plugin version
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -15,6 +21,11 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' } // Added for potential dependencies
+        maven {
+            // [required] background_fetch
+            url "${project(':background_fetch').projectDir}/libs"
+        }
     }
 }
 

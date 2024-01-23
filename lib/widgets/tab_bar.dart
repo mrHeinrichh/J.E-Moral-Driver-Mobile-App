@@ -25,6 +25,7 @@ class CustomTabBar extends StatelessWidget {
     final Map<String, dynamic> requestBody = {
       'pickedUp': true,
       'rider': userId, // Update the "rider" field with the current userId
+      'active': true,
     };
 
     final response = await http.patch(

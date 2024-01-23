@@ -7,9 +7,8 @@ import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
 
 // Import your view pages
-import 'package:driver_app/view/scandropcancel.page.dart';
+
 import 'package:driver_app/view/payment.page.dart';
-import 'package:driver_app/view/scandrop.page.dart';
 import 'package:driver_app/view/home.page.dart';
 import 'package:driver_app/view/login.page.dart';
 import 'package:driver_app/view/pickup.page.dart';
@@ -41,10 +40,7 @@ class MyApp extends StatelessWidget {
         loginRoute: (context) => LoginPage(), // Use the imported route
         homeRoute: (context) => HomePage(),
         pickupRoute: (context) => PickUpPage(transactionData: {}),
-
-        scanDropCancelRoute: (context) => ScanDropCancelPage(),
         dropOffRoute: (context) => DropOffPage(),
-        scanDropRoute: (context) => ScanDropPage(),
         paymentRoute: (context) => PaymentPage(),
         authenticateRoute: (context) => AuthenticatePage(transactionData: {}),
       },
