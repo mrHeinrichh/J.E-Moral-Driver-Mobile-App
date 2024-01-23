@@ -18,8 +18,8 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController =
       TextEditingController(text: 'rider');
 
-  Future<Map<String, dynamic>> login(String? email, String? password,
-      [BuildContext? context]) async {
+  Future<Map<String, dynamic>> login(
+      String? email, String? password, BuildContext? context) async {
     if (email == null || password == null) {
       print('Email or password is null');
       return {'error': 'Invalid email or password'};
@@ -29,7 +29,8 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/auth/login'),
+        Uri.parse(
+            'https://lpg-api-06n8.onrender.com/api/v1/users/authenticate/'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -49,42 +50,15 @@ class _LoginPageState extends State<LoginPage> {
             final List<dynamic>? userData = data['data'];
             if (userData != null && userData.isNotEmpty) {
               // Accessing the correct nested values
-              String userId = userData[0]['_doc']['user'] ?? '';
+              String userId = userData[0]['_doc']['_id'] ?? '';
 
               print('User ID: $userId');
 
-              // Fetch additional user details using the user ID
-              final userDetailsResponse = await http.get(
-                Uri.parse(
-                    'https://lpg-api-06n8.onrender.com/api/v1/users/$userId'),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              );
+              // Set the user ID in the app state
+              Provider.of<UserProvider>(context, listen: false)
+                  .setUserId(userId);
 
-              print('User Details Response: ${userDetailsResponse.statusCode}');
-
-              if (userDetailsResponse.statusCode == 200) {
-                final Map<String, dynamic> userDetailsData =
-                    jsonDecode(userDetailsResponse.body);
-
-                print('User Details: $userDetailsData');
-
-                // Extract "type" field from user details
-                String userType = userDetailsData['data']['user']['__t'] ?? '';
-
-                print('User Type: $userType');
-
-                if (userType == 'Rider') {
-                  // Set the user ID in the app state
-                  Provider.of<UserProvider>(context, listen: false)
-                      .setUserId(userId);
-                } else {
-                  return {'error': 'Invalid user type'};
-                }
-              } else {
-                return {'error': 'Failed to fetch user details'};
-              }
+              // You can also save other user details to the provider if needed
             } else {
               return {'error': 'User data is missing or empty'};
             }
