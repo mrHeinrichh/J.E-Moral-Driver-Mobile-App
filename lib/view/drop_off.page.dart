@@ -171,6 +171,7 @@ class _DropOffPageState extends State<DropOffPage> {
         "completed": true,
         "type": "Online",
         "active": false,
+        "cancelled": true,
       };
 
       try {
