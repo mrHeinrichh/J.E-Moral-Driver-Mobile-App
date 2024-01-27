@@ -20,17 +20,21 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isApproved = transactionData['isApproved'];
+    String status = transactionData['status'] ?? "Pending";
 
-    bool pickedUp = transactionData['pickedUp'];
+    bool pickedUp = transactionData['pickedUp'] ?? false;
 
-    bool isCompleted = transactionData['completed'];
+    bool isCompleted = transactionData['completed'] ?? false;
+
+    // Check if status is "Pending"
+    bool isPending = status == "Approved";
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
         children: [
           Visibility(
-            visible: isApproved && !isCompleted && !pickedUp,
+            visible: isPending && !isCompleted && !pickedUp,
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
@@ -50,7 +54,7 @@ class CustomCard extends StatelessWidget {
                         ),
                         SizedBox(width: 50),
                         Text(
-                          "Status Approval: ${transactionData['isApproved']}",
+                          "Status Approval: $status",
                           style: customTextStyle,
                         ),
                       ],

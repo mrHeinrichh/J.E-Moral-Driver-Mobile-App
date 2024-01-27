@@ -24,8 +24,9 @@ class CustomTabBar extends StatelessWidget {
         'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId');
     final Map<String, dynamic> requestBody = {
       'pickedUp': true,
+      'status': 'On Going',
       'rider': userId, // Update the "rider" field with the current userId
-      'active': true,
+      "__t": "Delivery"
     };
 
     final response = await http.patch(

@@ -37,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
         body: jsonEncode({
           'email': email,
           'password': password,
+          'type': 'Rider',
         }),
       );
 
@@ -50,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             final List<dynamic>? userData = data['data'];
             if (userData != null && userData.isNotEmpty) {
               // Accessing the correct nested values
-              String userId = userData[0]['_doc']['_id'] ?? '';
+              String userId = userData[0]['_id'] ?? '';
 
               print('User ID: $userId');
 

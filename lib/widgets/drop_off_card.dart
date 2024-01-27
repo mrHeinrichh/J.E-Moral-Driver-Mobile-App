@@ -132,6 +132,7 @@ class _DropOffCardState extends State<DropOffCard> {
         body: {
           'lat': latitude.toString(),
           'long': longitude.toString(),
+          "__t": "Delivery"
         },
       );
 

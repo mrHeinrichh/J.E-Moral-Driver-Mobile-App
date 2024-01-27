@@ -160,7 +160,8 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
       "cancelReason": cancelReason,
       "completed": false,
       "cancelled": true,
-      "active": false,
+      "status": "Cancelled",
+      "__t": "Delivery"
     };
 
     try {

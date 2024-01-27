@@ -170,8 +170,7 @@ class _DropOffPageState extends State<DropOffPage> {
         "cancelled": transactionData['cancelled'],
         "completed": true,
         "type": "Online",
-        "active": false,
-        "cancelled": true,
+        "__t": "Delivery"
       };
 
       try {
@@ -362,7 +361,7 @@ class _DropOffPageState extends State<DropOffPage> {
                           selectedPayment = newValue;
                         });
                       },
-                      items: <String?>['Cash on Delivery', 'GCash']
+                      items: <String?>['COD', 'GCASH']
                           .map<DropdownMenuItem<String>>((String? value) {
                         return DropdownMenuItem<String>(
                           value: value,
