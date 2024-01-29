@@ -20,7 +20,7 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String status = transactionData['status'] ?? "Pending";
+    String status = transactionData['status'] ?? "On Going";
 
     bool pickedUp = transactionData['pickedUp'] ?? false;
 
