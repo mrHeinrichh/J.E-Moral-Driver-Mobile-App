@@ -169,7 +169,7 @@ class _DropOffPageState extends State<DropOffPage> {
         "pickedUp": true,
         "cancelled": transactionData['cancelled'],
         "completed": true,
-        "type": "Online",
+        "status": "Completed",
         "__t": "Delivery"
       };
 
