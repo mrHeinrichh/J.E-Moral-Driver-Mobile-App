@@ -164,8 +164,8 @@ class _PickedUpCardState extends State<PickedUpCard> {
           "pickedUp": true,
           "cancelled": widget.transactionData['cancelled'],
           "completed": false,
-          "type": "Online",
-          "active": true,
+          "__t": "Delivery",
+          "status": "On Going",
         };
 
         // Patch request to update the transaction
@@ -177,6 +177,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
           body: json.encode(updateData),
         );
         if (response.statusCode == 200) {
+          print(pickupImagePath);
           print('Transaction updated successfully');
           print('Response: ${response.body}');
           print(response.statusCode);
