@@ -31,7 +31,7 @@ class CompletedCard extends StatelessWidget {
                       ),
                       SizedBox(width: 50),
                       Text(
-                        "Status Approval: ${transactionData['isApproved']}",
+                        "Status: ${transactionData['isApproved']}",
                         style: customTextStyle,
                       ),
                     ],

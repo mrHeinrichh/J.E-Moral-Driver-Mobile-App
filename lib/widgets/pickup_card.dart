@@ -260,7 +260,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
                       ),
                       SizedBox(width: 50),
                       Text(
-                        "Status Approval: ${widget.transactionData['isApproved']}",
+                        "Status: ${widget.transactionData['isApproved']}",
                         style: widget.customTextStyle,
                       ),
                     ],

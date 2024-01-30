@@ -54,7 +54,7 @@ class CustomCard extends StatelessWidget {
                         ),
                         SizedBox(width: 50),
                         Text(
-                          "Status Approval: $status",
+                          "Status: $status",
                           style: customTextStyle,
                         ),
                       ],
