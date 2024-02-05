@@ -1,5 +1,7 @@
+import 'package:driver_app/utils/productFormat.dart';
 import 'package:flutter/material.dart';
 import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/utils/DateTime.dart' as myUtils;
 
 class CompletedCard extends StatelessWidget {
   final TextStyle customTextStyle;
@@ -69,11 +71,11 @@ class CompletedCard extends StatelessWidget {
                     style: customTextStyle,
                   ),
                   Text(
-                    "Delivery Time: ${transactionData['deliveryTime']}",
+                    "Delivery Date/Time: ${myUtils.DateUtils.formatDeliveryDate(transactionData['deliveryDate'])}",
                     style: customTextStyle,
                   ),
                   Text(
-                    "Product List: ${transactionData['items']?.toString() ?? 'N/A'}",
+                    "Product List: ${ProductUtils.formatProductList(transactionData['items'])}",
                     style: customTextStyle,
                   ),
                   Text(

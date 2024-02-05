@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:driver_app/utils/productFormat.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -59,6 +60,10 @@ class _DropOffCardState extends State<DropOffCard> {
 
   void _getCurrentLocation() async {
     try {
+      if (!mounted) {
+        // Check if the widget is still mounted
+        return;
+      }
       // No need to check if locationPermission is null here
       // because it's initialized in the initState method
 
@@ -187,10 +192,6 @@ class _DropOffCardState extends State<DropOffCard> {
                           "Booker Contact: ${_fetchedTransactionData!['contactNumber']}",
                           style: widget.customTextStyle,
                         ),
-                        Text(
-                          "Booker Contact: ${_fetchedTransactionData!['contactNumber']}",
-                          style: widget.customTextStyle,
-                        ),
 
                         Text(
                           "Payment Method: ${_fetchedTransactionData!['paymentMethod']}",
@@ -201,19 +202,11 @@ class _DropOffCardState extends State<DropOffCard> {
                           style: widget.customTextStyle,
                         ),
                         Text(
-                          "Product List?: ${_fetchedTransactionData!['items']}",
+                          "Product List: ${ProductUtils.formatProductList(widget.transactionData['items'])}",
                           style: widget.customTextStyle,
                         ),
                         Text(
-                          "Total Price?: ${_fetchedTransactionData!['total']}",
-                          style: widget.customTextStyle,
-                        ),
-                        Text(
-                          "lat: ${_fetchedTransactionData!['lat']}",
-                          style: widget.customTextStyle,
-                        ),
-                        Text(
-                          "long: ${_fetchedTransactionData!['long']}",
+                          "Total Price: ${_fetchedTransactionData!['total']}",
                           style: widget.customTextStyle,
                         ),
                       ],

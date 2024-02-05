@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:driver_app/utils/productFormat.dart';
 import 'package:driver_app/widgets/card_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,6 +10,7 @@ import 'dart:async';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/services.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:driver_app/utils/DateTime.dart' as myUtils;
 
 class PickedUpCard extends StatefulWidget {
   final TextStyle customTextStyle;
@@ -260,7 +262,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
                       ),
                       SizedBox(width: 50),
                       Text(
-                        "Status: ${widget.transactionData['isApproved']}",
+                        "Status: ${widget.transactionData['status']}",
                         style: widget.customTextStyle,
                       ),
                     ],
@@ -273,20 +275,13 @@ class _PickedUpCardState extends State<PickedUpCard> {
                     "Address: ${widget.transactionData['deliveryLocation']}",
                     style: widget.customTextStyle,
                   ),
+                  Divider(),
                   Text(
-                    "Booker Name: ${widget.transactionData['name']}",
+                    "Drop off Name: ${widget.transactionData['name']}",
                     style: widget.customTextStyle,
                   ),
                   Text(
-                    "Booker Contact: ${widget.transactionData['contactNumber']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Receiver Name: ${widget.transactionData['receiverName']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Receiver Contact: ${widget.transactionData['receiverContact']}",
+                    "Drop off Contact: ${widget.transactionData['contactNumber']}",
                     style: widget.customTextStyle,
                   ),
                   Text(
@@ -298,23 +293,15 @@ class _PickedUpCardState extends State<PickedUpCard> {
                     style: widget.customTextStyle,
                   ),
                   Text(
-                    "Delivery Time: ${widget.transactionData['deliveryTime']}",
+                    "Delivery Date/Time: ${myUtils.DateUtils.formatDeliveryDate(widget.transactionData['deliveryDate'])}",
                     style: widget.customTextStyle,
                   ),
                   Text(
-                    "Product List: ${widget.transactionData['items']?.toString() ?? 'N/A'}",
+                    "Product List: ${ProductUtils.formatProductList(widget.transactionData['items'])}",
                     style: widget.customTextStyle,
                   ),
                   Text(
                     "Total Price: ${widget.transactionData['total']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "rider: ${widget.transactionData['rider']}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Pick up Images: ${widget.transactionData['pickupImages']}",
                     style: widget.customTextStyle,
                   ),
                   GestureDetector(

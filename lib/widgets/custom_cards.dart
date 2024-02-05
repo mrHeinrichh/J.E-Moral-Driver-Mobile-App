@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:driver_app/utils/productFormat.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/utils/DateTime.dart' as myUtils;
 
 class CustomCard extends StatelessWidget {
   final TextStyle customTextStyle;
@@ -67,6 +69,7 @@ class CustomCard extends StatelessWidget {
                       "Address: ${transactionData['deliveryLocation']}",
                       style: customTextStyle,
                     ),
+                    Divider(),
                     Text(
                       "Booker Name: ${transactionData['name']}",
                       style: customTextStyle,
@@ -92,11 +95,11 @@ class CustomCard extends StatelessWidget {
                       style: customTextStyle,
                     ),
                     Text(
-                      "Delivery Time: ${transactionData['deliveryTime']}",
+                      "Delivery Date/Time: ${myUtils.DateUtils.formatDeliveryDate(transactionData['deliveryDate'])}",
                       style: customTextStyle,
                     ),
                     Text(
-                      "Product List: ${transactionData['items']?.toString() ?? 'N/A'}",
+                      "Product List: ${ProductUtils.formatProductList(transactionData['items'])}",
                       style: customTextStyle,
                     ),
                     Text(

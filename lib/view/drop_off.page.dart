@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:driver_app/routes/app_routes.dart';
+import 'package:driver_app/utils/productFormat.dart';
 import 'package:driver_app/widgets/payment_details.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -164,7 +165,6 @@ class _DropOffPageState extends State<DropOffPage> {
         "hasFeedback": transactionData['hasFeedback'],
         "feedback": transactionData['feedback'],
         "rating": transactionData['rating'],
-        "pickupImages": transactionData['pickupImages'],
         "completionImages": pickupImagePath,
         "pickedUp": true,
         "cancelled": transactionData['cancelled'],
@@ -236,7 +236,7 @@ class _DropOffPageState extends State<DropOffPage> {
                               style: customTextStyle,
                             ),
                             Text(
-                              "Product List ${transactionData['items']}",
+                              "Product List: ${ProductUtils.formatProductList(transactionData['items'])}",
                               style: customTextStyle,
                             ),
                             Text(
