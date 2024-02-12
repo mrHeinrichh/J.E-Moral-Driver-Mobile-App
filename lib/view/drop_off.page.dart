@@ -146,31 +146,11 @@ class _DropOffPageState extends State<DropOffPage> {
     Future<void> _updateTransaction(String transactionId,
         String pickupImagePath, String paymentMethod) async {
       final String apiUrl =
-          'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
+          'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId/complete';
 
       Map<String, dynamic> updateData = {
-        "deliveryLocation": transactionData['deliveryLocation'],
-        "name": transactionData['name'],
-        "contactNumber": transactionData['contactNumber'],
-        "houseLotBlk": transactionData['houseLotBlk'],
-        "barangay": transactionData['barangay'],
         "paymentMethod": paymentMethod,
-        "assembly": transactionData['assembly'],
-        "isApproved": transactionData['isApproved'],
-        "deliveryTime": transactionData['deliveryTime'],
-        "total": transactionData['total'],
-        "items": transactionData['items'],
-        "customer": transactionData['customer'],
-        "rider": transactionData['rider'],
-        "hasFeedback": transactionData['hasFeedback'],
-        "feedback": transactionData['feedback'],
-        "rating": transactionData['rating'],
         "completionImages": pickupImagePath,
-        "pickedUp": true,
-        "cancelled": transactionData['cancelled'],
-        "completed": true,
-        "status": "Completed",
-        "__t": "Delivery"
       };
 
       try {
