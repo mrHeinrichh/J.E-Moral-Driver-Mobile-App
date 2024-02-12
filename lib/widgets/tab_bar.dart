@@ -21,12 +21,9 @@ class CustomTabBar extends StatelessWidget {
   Future<void> updateTransactionStatus(
       String transactionId, String userId) async {
     final Uri url = Uri.parse(
-        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId');
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId/accept');
     final Map<String, dynamic> requestBody = {
-      'pickedUp': true,
-      'status': 'On Going',
       'rider': userId, // Update the "rider" field with the current userId
-      "__t": "Delivery"
     };
 
     final response = await http.patch(

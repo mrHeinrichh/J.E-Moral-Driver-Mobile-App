@@ -3,7 +3,7 @@ class ProductUtils {
     if (items != null && items.isNotEmpty) {
       List<String> formattedItems = items.map<String>((item) {
         if (item is Map<String, dynamic>) {
-          print('Item: $item'); // Add this line to debug
+          // Add this line to debug
           // Check if the item has the required keys
           if (item.containsKey('name') &&
               item.containsKey('quantity') &&

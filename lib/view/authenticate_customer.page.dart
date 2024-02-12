@@ -153,15 +153,11 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
   Future<void> _updateTransaction(
       String transactionId, String cancelImagepath, String cancelReason) async {
     final String apiUrl =
-        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId/cancel';
 
     Map<String, dynamic> updateData = {
       "cancellationImages": cancelImagepath,
       "cancelReason": cancelReason,
-      "completed": false,
-      "cancelled": true,
-      "status": "Cancelled",
-      "__t": "Delivery"
     };
 
     try {
