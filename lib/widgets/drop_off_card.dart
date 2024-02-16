@@ -123,9 +123,9 @@ class _DropOffCardState extends State<DropOffCard> {
   }
 
   Future<void> _updateApi() async {
-    if (_fetchedTransactionData == null) {
-      return;
-    }
+    // if (_fetchedTransactionData == null) {
+    //   return;
+    // }
 
     final String transactionId = _fetchedTransactionData!['_id'];
     final apiUrl =

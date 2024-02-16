@@ -132,7 +132,6 @@ class _DropOffPageState extends State<DropOffPage> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
                   Navigator.pushNamed(context, homeRoute);
                 },
                 child: Text("Okay"),
@@ -152,7 +151,7 @@ class _DropOffPageState extends State<DropOffPage> {
         "paymentMethod": paymentMethod,
         "completionImages": pickupImagePath,
       };
-
+      print(paymentMethod);
       try {
         final http.Response response = await http.patch(
           Uri.parse(apiUrl),

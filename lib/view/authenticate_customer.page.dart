@@ -32,6 +32,7 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
   Future<void> _startQRScanner(
       BuildContext context, Map<String, dynamic> transactionData) async {
     print('Transaction ID: ${transactionData['_id']}');
+    print('Transaction ID: ${transactionData['pickupImages']}');
 
     showDialog(
       context: context,

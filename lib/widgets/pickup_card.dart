@@ -120,9 +120,9 @@ class _PickedUpCardState extends State<PickedUpCard> {
         print('Upload success: $decodedResponse');
 
         // Extract the path from the response
-        String pickupImagePath = decodedResponse['data'][0]['path'];
+        String pickupImagePaths = decodedResponse['data'][0]['path'];
 
-        return pickupImagePath; // Return the pickupImagePath
+        return pickupImagePaths; // Return the pickupImagePaths
       } else {
         print('Upload failed with status ${response.statusCode}');
         return ''; // Handle failure appropriately
@@ -134,7 +134,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
   }
 
   Future<void> _updateTransaction(
-      String transactionId, String pickupImagePath) async {
+      String transactionId, String pickupImagePaths) async {
     try {
       // Geocode the delivery location to get latitude and longitude
       String deliveryLocation = widget.transactionData['deliveryLocation'];
@@ -146,26 +146,8 @@ class _PickedUpCardState extends State<PickedUpCard> {
 
         // Update the transaction data
         Map<String, dynamic> updateData = {
-          "deliveryLocation": widget.transactionData['deliveryLocation'],
-          "name": widget.transactionData['name'],
-          "contactNumber": widget.transactionData['contactNumber'],
-          "houseLotBlk": widget.transactionData['houseLotBlk'],
-          "barangay": widget.transactionData['barangay'],
-          "paymentMethod": widget.transactionData['paymentMethod'],
-          "assembly": widget.transactionData['assembly'],
-          "isApproved": widget.transactionData['isApproved'],
-          "deliveryTime": widget.transactionData['deliveryTime'],
-          "total": widget.transactionData['total'],
-          "items": widget.transactionData['items'],
-          "customer": widget.transactionData['customer'],
-          "hasFeedback": widget.transactionData['hasFeedback'],
-          "feedback": widget.transactionData['feedback'],
-          "rating": widget.transactionData['rating'],
-          "pickupImages": pickupImagePath,
-          "completionImages": widget.transactionData['completionImages'],
+          "pickupImages": pickupImagePaths,
           "pickedUp": true,
-          "cancelled": widget.transactionData['cancelled'],
-          "completed": false,
           "__t": "Delivery",
           "status": "On Going",
         };
@@ -179,7 +161,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
           body: json.encode(updateData),
         );
         if (response.statusCode == 200) {
-          print(pickupImagePath);
+          print(pickupImagePaths);
           print('Transaction updated successfully');
           print('Response: ${response.body}');
           print(response.statusCode);
@@ -375,12 +357,12 @@ class _PickedUpCardState extends State<PickedUpCard> {
                     text: widget.buttonText,
                     onPressed: () async {
                       if (_image != null) {
-                        // Upload the image and get the pickupImagePath
-                        String pickupImagePath = await _uploadImage(_image!);
+                        // Upload the image and get the pickupImagePaths
+                        String pickupImagePaths = await _uploadImage(_image!);
 
                         // Call _updateTransaction with both arguments
                         _updateTransaction(
-                            widget.transactionData['_id'], pickupImagePath);
+                            widget.transactionData['_id'], pickupImagePaths);
 
                         if (widget.onPressed != null) {
                           widget.onPressed();
