@@ -78,7 +78,7 @@ class CustomTabBar extends StatelessWidget {
                       width: 90.0,
                       child: const Tab(
                         child: Text(
-                          'Completed',
+                          'On Going',
                           style: TextStyle(fontSize: 14),
                         ),
                       ),
@@ -88,7 +88,7 @@ class CustomTabBar extends StatelessWidget {
                       width: 90.0,
                       child: const Tab(
                         child: Text(
-                          'Uncompleted',
+                          'Completed',
                           style: TextStyle(fontSize: 14),
                         ),
                       ),
@@ -140,16 +140,6 @@ class CustomTabBar extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ListView(
-                    children: [
-                      for (var transaction in transactions.where(
-                          (transaction) => transaction['completed'] == true))
-                        CompletedCard(
-                          customTextStyle: customTextStyle,
-                          transactionData: transaction,
-                        ),
-                    ],
-                  ),
                   SingleChildScrollView(
                     child: Column(
                       children: [
@@ -181,6 +171,16 @@ class CustomTabBar extends StatelessWidget {
                           ),
                       ],
                     ),
+                  ),
+                  ListView(
+                    children: [
+                      for (var transaction in transactions.where(
+                          (transaction) => transaction['completed'] == true))
+                        CompletedCard(
+                          customTextStyle: customTextStyle,
+                          transactionData: transaction,
+                        ),
+                    ],
                   ),
                 ],
               ),
