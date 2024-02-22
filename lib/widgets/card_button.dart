@@ -46,8 +46,7 @@ class SpareButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 60.0),
-          primary: backgroundColor,
-          onPrimary: Colors.white,
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

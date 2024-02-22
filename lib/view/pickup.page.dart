@@ -16,15 +16,16 @@ class PickUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFe7e0e0),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
           'Pick Up Deliveries',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFd41111),
         centerTitle: true,
       ),
       body: Column(

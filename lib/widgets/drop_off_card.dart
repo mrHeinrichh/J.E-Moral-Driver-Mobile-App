@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' as Math;
+import 'package:intl/intl.dart';
 
 class DropOffCard extends StatefulWidget {
   final TextStyle customTextStyle;
@@ -162,52 +163,266 @@ class _DropOffCardState extends State<DropOffCard> {
         children: [
           Card(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(25, 25, 25, 10),
+              padding: EdgeInsets.fromLTRB(25, 25, 25, 15),
               child: _fetchedTransactionData != null
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Display fetched transaction data here
-                        Text(
-                          "Transaction id: ${_fetchedTransactionData!['_id']}",
-                          style: widget.customTextStyle,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Transaction id: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${_fetchedTransactionData!['_id']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          "Barangay: ${_fetchedTransactionData!['barangay']}",
-                          style: widget.customTextStyle,
+                        Divider(
+                          color: Colors.black,
                         ),
-                        Text(
-                          "Houst#/Lot/Blk: ${_fetchedTransactionData!['houseLotBlk']}",
-                          style: widget.customTextStyle,
-                        ),
-                        Text(
-                          "Address: ${_fetchedTransactionData!['deliveryLocation']}",
-                          style: widget.customTextStyle,
-                        ),
-                        Text(
-                          "Booker Name: ${_fetchedTransactionData!['name']}",
-                          style: widget.customTextStyle,
-                        ),
-                        Text(
-                          "Booker Contact: ${_fetchedTransactionData!['contactNumber']}",
-                          style: widget.customTextStyle,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Receiver Name: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${_fetchedTransactionData!['name']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
                         ),
 
-                        Text(
-                          "Payment Method: ${_fetchedTransactionData!['paymentMethod']}",
-                          style: widget.customTextStyle,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Receiver Contact Number: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${_fetchedTransactionData!['contactNumber']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          "Needs to be Assmbled?: ${_fetchedTransactionData!['assembly']}",
-                          style: widget.customTextStyle,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Pin Location: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${_fetchedTransactionData!['deliveryLocation']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          "Product List: ${ProductUtils.formatProductList(widget.transactionData['items'])}",
-                          style: widget.customTextStyle,
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "House#/Lot/Blk:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${_fetchedTransactionData!['houseLotBlk']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          "Total Price: ${_fetchedTransactionData!['total']}",
-                          style: widget.customTextStyle,
+                        Row(
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Barangay: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '${_fetchedTransactionData!['barangay']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            Spacer(), // Adjustable space
+                          ],
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Payment Method: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${_fetchedTransactionData!['paymentMethod']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Assemble Option: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    _fetchedTransactionData!['assembly'] != null
+                                        ? (_fetchedTransactionData!['assembly']
+                                            ? 'Yes'
+                                            : 'No')
+                                        : 'N/A',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Items: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (_fetchedTransactionData!['items'] != null)
+                                TextSpan(
+                                  text: (_fetchedTransactionData!['items']
+                                          as List)
+                                      .map((item) {
+                                    if (item is Map<String, dynamic> &&
+                                        item.containsKey('name') &&
+                                        item.containsKey('quantity')) {
+                                      return '${item['name']} (${item['quantity']})';
+                                    }
+                                    return '';
+                                  }).join(', '),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "Total Price: ",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '₱${_fetchedTransactionData!['total']}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          color: Colors.black,
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Ordered By: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text: '${_fetchedTransactionData!['name']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Ordered By Contact Number: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${_fetchedTransactionData!['contactNumber']}',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Delivery Date/Time: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: _fetchedTransactionData!['updatedAt'] !=
+                                        null
+                                    ? DateFormat('MMM d, y - h:mm a').format(
+                                        DateTime.parse(_fetchedTransactionData![
+                                            'updatedAt']),
+                                      )
+                                    : 'null',
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     )

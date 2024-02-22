@@ -82,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFe7e0e0),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -111,7 +112,6 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Enter your Password",
                   ),
                 ),
-          
                 SizedBox(height: 30.0),
                 Column(
                   children: [

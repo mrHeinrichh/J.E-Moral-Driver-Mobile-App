@@ -42,12 +42,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFe7e0e0),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
           'Deliveries',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         actions: [
@@ -55,7 +56,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(
               Icons.refresh,
-              color: Colors.black,
+              color: Colors.white,
             ),
             onPressed: () {
               // Call the fetchData method to refresh data
@@ -63,14 +64,16 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFd41111),
+
         centerTitle: true,
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
               icon: const Icon(
                 Icons.menu,
-                color: Colors.black,
+                color: Colors.white,
               ),
               onPressed: () {
                 Scaffold.of(context).openDrawer();

@@ -40,8 +40,8 @@ class ConfirmPickupDialog extends StatelessWidget {
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white, // Background color of button
-                    onPrimary: Color(0xFF5E738A), // Text color of button
+                    backgroundColor: Colors.white, // Background color of button
+                    // onPrimary: Color(0xFF5E738A), // Text color of button
                     side: BorderSide(
                         color: Color(0xFF5E738A),
                         width: 2), // Outer line color and width
@@ -222,8 +222,8 @@ class _CancelOrderDialogState extends State<CancelOrderDialog> {
                     Navigator.of(context).pop(); // Close the dialog
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    onPrimary: Color(0xFF5E738A),
+                    backgroundColor: Colors.white,
+                    // backgroundColor: Color(0xFF5E738A),
                     side: BorderSide(color: Color(0xFF5E738A), width: 2),
                   ),
                   child: Text('Cancel'),
@@ -235,8 +235,9 @@ class _CancelOrderDialogState extends State<CancelOrderDialog> {
                     // Navigator.pushNamed(context, gpsRoute);
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: _imageCaptured ? Colors.red : Color(0xFF5E738A),
-                    onPrimary: Colors.white,
+                    backgroundColor:
+                        _imageCaptured ? Colors.red : Color(0xFF5E738A),
+                    // onPrimary: Colors.white,
                     side: BorderSide(
                       color: _imageCaptured ? Colors.red : Color(0xFF5E738A),
                       width: 2,

@@ -11,6 +11,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:flutter/services.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:driver_app/utils/DateTime.dart' as myUtils;
+import 'package:intl/intl.dart';
 
 class PickedUpCard extends StatefulWidget {
   final TextStyle customTextStyle;
@@ -231,60 +232,250 @@ class _PickedUpCardState extends State<PickedUpCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Transaction id: ${widget.transactionData['_id']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Transaction ID: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['_id']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.black,
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Receiver Name: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['name']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Receiver Contact Number: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['contactNumber']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Pin Location: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['deliveryLocation']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "House#/Lot/Blk:",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['houseLotBlk']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Barangay: ${widget.transactionData['barangay']}",
-                        style: widget.customTextStyle,
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Barangay: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF050404),
+                              ),
+                            ),
+                            TextSpan(
+                              text: '${widget.transactionData['barangay']}',
+                              style: TextStyle(color: Color(0xFF050404)),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(width: 50),
-                      Text(
-                        "Status: ${widget.transactionData['status']}",
-                        style: widget.customTextStyle,
-                      ),
+
+                      Spacer(), // Adjustable space
                     ],
                   ),
-                  Text(
-                    "House#/Lot/Blk: ${widget.transactionData['houseLotBlk']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Payment Method: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['paymentMethod']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Address: ${widget.transactionData['deliveryLocation']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Assemble Option: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: widget.transactionData['assembly'] != null
+                              ? (widget.transactionData['assembly']
+                                  ? 'Yes'
+                                  : 'No')
+                              : 'N/A',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
                   ),
-                  Divider(),
-                  Text(
-                    "Drop off Name: ${widget.transactionData['name']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Items: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (widget.transactionData['items'] != null)
+                          TextSpan(
+                            text: (widget.transactionData['items'] as List)
+                                .map((item) {
+                              if (item is Map<String, dynamic> &&
+                                  item.containsKey('name') &&
+                                  item.containsKey('quantity')) {
+                                return '${item['name']} (${item['quantity']})';
+                              }
+                              return '';
+                            }).join(', '),
+                          ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Drop off Contact: ${widget.transactionData['contactNumber']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: "Total Price: ",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '₱${widget.transactionData['total']}',
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Payment Method: ${widget.transactionData['paymentMethod']}",
-                    style: widget.customTextStyle,
+                  Divider(
+                    color: Colors.black,
                   ),
-                  Text(
-                    "Needs to be assembled: ${widget.transactionData['assembly']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Ordered By: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['name']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Delivery Date/Time: ${myUtils.DateUtils.formatDeliveryDate(widget.transactionData['deliveryDate'])}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Ordered By Contact Number: ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF050404),
+                          ),
+                        ),
+                        TextSpan(
+                          text: '${widget.transactionData['contactNumber']}',
+                          style: TextStyle(color: Color(0xFF050404)),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "Product List: ${ProductUtils.formatProductList(widget.transactionData['items'])}",
-                    style: widget.customTextStyle,
-                  ),
-                  Text(
-                    "Total Price: ${widget.transactionData['total']}",
-                    style: widget.customTextStyle,
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Delivery Date/Time: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextSpan(
+                          text: widget.transactionData['updatedAt'] != null
+                              ? DateFormat('MMM d, y - h:mm a').format(
+                                  DateTime.parse(
+                                      widget.transactionData['updatedAt']),
+                                )
+                              : 'null',
+                        ),
+                      ],
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -369,6 +560,15 @@ class _PickedUpCardState extends State<PickedUpCard> {
                         }
                       } else {
                         print('No image captured.');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('No image captured.'),
+                            duration: Duration(
+                                seconds:
+                                    2), // Set the duration for the snackbar
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     },
                     color: _imageCaptured ? Color(0xFFBD2019) : widget.btncolor,

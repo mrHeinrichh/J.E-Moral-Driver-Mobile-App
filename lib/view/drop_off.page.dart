@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class DropOffPage extends StatefulWidget {
   final VoidCallback? onPressed;
@@ -176,9 +177,15 @@ class _DropOffPageState extends State<DropOffPage> {
     }
 
     return Scaffold(
+      backgroundColor: Color(0xFFe7e0e0),
       appBar: AppBar(
-        title: const Text('Drop Off Payment'),
-        backgroundColor: Colors.white,
+        title: const Text(
+          'Drop Off Payment',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color(0xFFd41111),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
@@ -210,29 +217,253 @@ class _DropOffPageState extends State<DropOffPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Transaction ID.: ${transactionData['_id']}",
-                              style: customTextStyle,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Transaction ID: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['_id']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(
-                              "Product List: ${ProductUtils.formatProductList(transactionData['items'])}",
-                              style: customTextStyle,
+                            Divider(
+                              color: Colors.black,
                             ),
-                            Text(
-                              "Name ${transactionData['name']}",
-                              style: customTextStyle,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Receiver Name: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['name']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(
-                              "Contact Number ${transactionData['contactNumber']}",
-                              style: customTextStyle,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Receiver Contact Number: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['contactNumber']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(
-                              "House/Lot/Blk ${transactionData['houseLotBlk']}",
-                              style: customTextStyle,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Pin Location: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        '${transactionData['deliveryLocation']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Text(
-                              "Pin Location ${transactionData['deliveryLocation']}",
-                              style: customTextStyle,
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "House#/Lot/Blk:",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['houseLotBlk']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Barangay: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF050404),
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '${transactionData['barangay']}',
+                                        style:
+                                            TextStyle(color: Color(0xFF050404)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                Spacer(), // Adjustable space
+                              ],
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Payment Method: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['paymentMethod']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Assemble Option: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: transactionData['assembly'] != null
+                                        ? (transactionData['assembly']
+                                            ? 'Yes'
+                                            : 'No')
+                                        : 'N/A',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Items: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (transactionData['items'] != null)
+                                    TextSpan(
+                                      text: (transactionData['items'] as List)
+                                          .map((item) {
+                                        if (item is Map<String, dynamic> &&
+                                            item.containsKey('name') &&
+                                            item.containsKey('quantity')) {
+                                          return '${item['name']} (${item['quantity']})';
+                                        }
+                                        return '';
+                                      }).join(', '),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Total Price: ",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '₱${transactionData['total']}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              color: Colors.black,
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Ordered By: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['name']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "Ordered By Contact Number: ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF050404),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${transactionData['contactNumber']}',
+                                    style: TextStyle(color: Color(0xFF050404)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Delivery Date/Time: ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: transactionData['updatedAt'] != null
+                                        ? DateFormat('MMM d, y - h:mm a')
+                                            .format(
+                                            DateTime.parse(
+                                                transactionData['updatedAt']),
+                                          )
+                                        : 'null',
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -380,6 +611,15 @@ class _DropOffPageState extends State<DropOffPage> {
                         }
                       } else {
                         print('No image captured.');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('No image captured.'),
+                            duration: Duration(
+                                seconds:
+                                    2), // Set the duration for the snackbar
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     },
                     backgroundColor: Colors.red,

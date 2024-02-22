@@ -99,7 +99,7 @@ class DriverInformation extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "E-Wallet Driver Information",
+            "\nE-Wallet Driver Information",
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
