@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
         body: jsonEncode({
           'email': email,
           'password': password,
-          'type': 'Rider',
+          '__t': 'Rider',
         }),
       );
 
