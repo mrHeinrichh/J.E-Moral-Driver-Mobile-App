@@ -1,6 +1,7 @@
 import 'package:driver_app/routes/app_routes.dart';
 import 'package:driver_app/view/user_provider.dart';
 import 'package:driver_app/widgets/login_button.dart';
+import 'package:driver_app/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -82,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFe7e0e0),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -97,22 +98,18 @@ class _LoginPageState extends State<LoginPage> {
                   height: null,
                 ),
                 const SizedBox(height: 50.0),
-                TextField(
+                LoginTextField(
                   controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: "Email Address",
-                    hintText: "Enter your Email Address",
-                  ),
+                  labelText: "Email Address",
+                  hintText: "Enter your Email Address",
                 ),
-                TextField(
+                LoginTextField(
                   controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    hintText: "Enter your Password",
-                  ),
+                  labelText: "Password",
+                  hintText: "Enter your Password",
                 ),
-                SizedBox(height: 30.0),
+                const SizedBox(height: 30.0),
                 Column(
                   children: [
                     LoginButton(
