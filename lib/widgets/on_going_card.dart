@@ -1,20 +1,14 @@
-import 'dart:convert';
-import 'package:driver_app/utils/productFormat.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:driver_app/widgets/card_button.dart';
-import 'package:driver_app/utils/DateTime.dart' as myUtils;
 import 'package:intl/intl.dart';
 
-class CustomCard extends StatelessWidget {
-  final TextStyle customTextStyle;
+class OnGoingCard extends StatelessWidget {
   final String buttonText;
   final VoidCallback onPressed;
   final btncolor;
   final Map<String, dynamic> transactionData;
 
-  CustomCard({
-    required this.customTextStyle,
+  OnGoingCard({
     required this.buttonText,
     required this.onPressed,
     required this.btncolor,
@@ -25,22 +19,20 @@ class CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String status = transactionData['status'] ?? "On Going";
 
-    bool pickedUp = transactionData['pickedUp'] ?? false;
-
     bool isCompleted = transactionData['completed'] ?? false;
 
     // Check if status is "Pending"
-    bool isPending = status == "Approved";
+    bool isPending = status == "On Going";
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(
         children: [
           Visibility(
-            visible: isPending && !isCompleted && !pickedUp,
+            visible: isPending && !isCompleted,
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
+                padding: const EdgeInsets.fromLTRB(25, 15, 25, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -230,16 +222,23 @@ class CustomCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Spacer(),
-                        Text(
-                          "Status: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
+                        Spacer(), // Adjustable space
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Status: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF050404),
+                                ),
+                              ),
+                              TextSpan(
+                                text: '$status',
+                                style: TextStyle(color: Color(0xFF050404)),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          "${transactionData['status']}",
                         ),
                       ],
                     ),
@@ -300,10 +299,14 @@ class CustomCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    CardButton(
-                      text: buttonText,
-                      onPressed: onPressed,
-                      color: btncolor,
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: 10.0), // Adjust the value as needed
+                      child: CardButton(
+                        text: buttonText,
+                        onPressed: onPressed,
+                        color: btncolor,
+                      ),
                     ),
                   ],
                 ),

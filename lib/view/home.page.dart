@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       if (jsonResponse.containsKey('data')) {
-        // Assuming transactions are stored under the 'data' key
         final List<dynamic> transactionsData = jsonResponse['data'];
         transactions = transactionsData.cast<Map<String, dynamic>>();
       } else {
@@ -35,14 +34,12 @@ class _HomePageState extends State<HomePage> {
     } else {
       throw Exception('Failed to load transactions');
     }
-
-    setState(() {}); // Update the UI with the fetched data
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFe7e0e0),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
@@ -52,21 +49,17 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          // Add a refresh icon button
           IconButton(
             icon: const Icon(
               Icons.refresh,
               color: Colors.white,
             ),
             onPressed: () {
-              // Call the fetchData method to refresh data
               fetchData();
             },
           ),
         ],
-        // backgroundColor: Colors.white,
-        backgroundColor: const Color(0xFFd41111),
-
+        backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
         centerTitle: true,
         leading: Builder(
           builder: (BuildContext context) {

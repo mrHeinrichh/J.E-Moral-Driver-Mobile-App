@@ -1,15 +1,10 @@
-import 'package:driver_app/utils/productFormat.dart';
 import 'package:flutter/material.dart';
-import 'package:driver_app/widgets/card_button.dart';
-import 'package:driver_app/utils/DateTime.dart' as myUtils;
 import 'package:intl/intl.dart';
 
 class CompletedCard extends StatelessWidget {
-  final TextStyle customTextStyle;
   final Map<String, dynamic> transactionData;
 
   CompletedCard({
-    required this.customTextStyle,
     required this.transactionData,
   });
 

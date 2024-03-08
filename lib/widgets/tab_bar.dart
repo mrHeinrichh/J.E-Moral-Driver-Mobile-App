@@ -1,9 +1,8 @@
 import 'package:driver_app/view/pickup.page.dart';
 import 'package:driver_app/view/user_provider.dart';
-import 'package:driver_app/widgets/card_button.dart';
-import 'package:driver_app/widgets/completed_cards.dart';
-import 'package:driver_app/widgets/custom_cards.dart';
-import 'package:driver_app/widgets/uncomplete_cards.dart';
+import 'package:driver_app/widgets/completed_card.dart';
+import 'package:driver_app/widgets/pending_order_card.dart';
+import 'package:driver_app/widgets/on_going_card.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -14,17 +13,12 @@ class CustomTabBar extends StatelessWidget {
 
   CustomTabBar({required this.transactions});
 
-  final TextStyle customTextStyle = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.bold,
-    color: Color(0xFF8D9DAE),
-  );
   Future<void> updateTransactionStatus(
       String transactionId, String userId) async {
     final Uri url = Uri.parse(
         'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId/accept');
     final Map<String, dynamic> requestBody = {
-      'rider': userId, // Update the "rider" field with the current userId
+      'rider': userId,
     };
 
     final response = await http.patch(
@@ -45,7 +39,6 @@ class CustomTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
-      // Access the userId from UserProvider
       String? userId = userProvider.userId;
       print('User ID: $userId');
       return DefaultTabController(
@@ -57,7 +50,7 @@ class CustomTabBar extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCB8686),
+                  color: const Color(0xFFA81616).withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: TabBar(
@@ -112,15 +105,12 @@ class CustomTabBar extends StatelessWidget {
                     child: Column(
                       children: [
                         for (var transaction in transactions)
-                          CustomCard(
-                            customTextStyle: customTextStyle,
+                          PendingOrderCard(
                             buttonText: 'Accept',
                             onPressed: () async {
-                              // Retrieve the transaction ID
                               String? transactionId = transaction['_id'];
 
                               if (transactionId != null) {
-                                // Call the function to update the transaction status
                                 await updateTransactionStatus(
                                     transactionId, userId!);
 
@@ -144,8 +134,7 @@ class CustomTabBar extends StatelessWidget {
                     child: Column(
                       children: [
                         for (var transaction in transactions)
-                          UncompleteCard(
-                            customTextStyle: customTextStyle,
+                          OnGoingCard(
                             buttonText: 'Retry',
                             onPressed: () async {
                               // Retrieve the transaction ID
@@ -177,7 +166,6 @@ class CustomTabBar extends StatelessWidget {
                       for (var transaction in transactions.where(
                           (transaction) => transaction['completed'] == true))
                         CompletedCard(
-                          customTextStyle: customTextStyle,
                           transactionData: transaction,
                         ),
                     ],
