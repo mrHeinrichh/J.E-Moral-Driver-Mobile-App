@@ -1,20 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:driver_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class DropOffCard extends StatefulWidget {
-  final String buttonText;
-  final VoidCallback onPressed;
-  final Color btncolor;
   final Map<String, dynamic> transactionData;
 
   DropOffCard({
-    required this.buttonText,
-    required this.onPressed,
-    required this.btncolor,
     required this.transactionData,
   });
 
@@ -24,23 +20,21 @@ class DropOffCard extends StatefulWidget {
 
 class _DropOffCardState extends State<DropOffCard> {
   Map<String, dynamic>? _fetchedTransactionData;
-  late Timer _timer; // Timer for periodic fetching
+  late Timer _timer;
   final Geolocator _geolocator = Geolocator();
   late double latitude;
   late double longitude;
   late LocationPermission locationPermission = LocationPermission.denied;
 
   late StreamSubscription<Position> _positionStream;
-  bool _fetchSuccess = false; // Track if the data fetch is successful
+  bool _fetchSuccess = false;
 
   @override
   void initState() {
     super.initState();
     fetchTransactionData();
-    // Set up a timer to fetch location every 2 seconds
-    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
+    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
       if (_fetchSuccess) {
-        // Only fetch location if data fetch is successful
         _getCurrentLocation();
       }
     });
@@ -56,13 +50,9 @@ class _DropOffCardState extends State<DropOffCard> {
   void _getCurrentLocation() async {
     try {
       if (!mounted) {
-        // Check if the widget is still mounted
         return;
       }
-      // No need to check if locationPermission is null here
-      // because it's initialized in the initState method
 
-      // If locationPermission is denied, request permission
       if (locationPermission == LocationPermission.denied) {
         locationPermission = await Geolocator.requestPermission();
         if (locationPermission == LocationPermission.denied) {
@@ -100,19 +90,16 @@ class _DropOffCardState extends State<DropOffCard> {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        // Successful response, parse and set the data
         final responseData = json.decode(response.body);
         setState(() {
           _fetchedTransactionData = responseData['data'];
-          _fetchSuccess = true; // Set the success flag to true
+          _fetchSuccess = true;
         });
       } else {
-        // Handle error if the request was not successful
         print(
             'Failed to fetch transaction data. Status code: ${response.statusCode}');
       }
     } catch (error) {
-      // Handle network or other errors
       print('Error during transaction data fetching: $error');
     }
   }
@@ -152,278 +139,146 @@ class _DropOffCardState extends State<DropOffCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(28, 10, 28, 10),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
         children: [
           Card(
+            color: Colors.white,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(25, 25, 25, 15),
-              child: _fetchedTransactionData != null
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Display fetched transaction data here
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Transaction id: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
+                padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                child: _fetchedTransactionData == null
+                    ? Center(
+                        child: LoadingAnimationWidget.flickr(
+                          leftDotColor:
+                              const Color(0xFF050404).withOpacity(0.8),
+                          rightDotColor:
+                              const Color(0xFFd41111).withOpacity(0.8),
+                          size: 40,
+                        ),
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Column(
+                              children: [
+                                const BodyMedium(
+                                  text: "Transaction ID:",
                                 ),
-                              ),
-                              TextSpan(
-                                text: '${_fetchedTransactionData!['_id']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Receiver Name: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
+                                BodyMedium(
+                                  text: _fetchedTransactionData!['_id'],
                                 ),
-                              ),
-                              TextSpan(
-                                text: '${_fetchedTransactionData!['name']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Receiver Contact Number: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${_fetchedTransactionData!['contactNumber']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Pin Location: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${_fetchedTransactionData!['deliveryLocation']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "House#/Lot/Blk:",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${_fetchedTransactionData!['houseLotBlk']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Barangay: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        '${_fetchedTransactionData!['barangay']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
+                          ),
+                          const Divider(),
+                          BodyMediumText(
+                            text: _fetchedTransactionData!
+                                    .containsKey('discountIdImage')
+                                ? 'Ordered by: Customer'
+                                : _fetchedTransactionData!['discounted'] ==
+                                        false
+                                    ? 'Ordered by: Retailer'
+                                    : '',
+                          ),
+                          if (widget.transactionData
+                              .containsKey('discountIdImage'))
+                            BodyMediumText(
+                              text:
+                                  _fetchedTransactionData!['discountIdImage'] !=
+                                              null &&
+                                          _fetchedTransactionData![
+                                                  'discountIdImage'] !=
+                                              ""
+                                      ? 'Discounted: Yes'
+                                      : 'Discounted: No',
+                            ),
+                          const SizedBox(height: 5),
+                          BodyMediumText(
+                              text:
+                                  "Order Status: ${_fetchedTransactionData!['status']}"),
+                          const Divider(),
+                          const Center(
+                            child: BodyMedium(text: "Receiver Infomation"),
+                          ),
+                          const SizedBox(height: 5),
+                          BodyMediumText(
+                              text:
+                                  "Name: ${_fetchedTransactionData!['name']}"),
+                          BodyMediumText(
+                              text:
+                                  "Mobile Number: ${_fetchedTransactionData!['contactNumber']}"),
+                          BodyMediumOver(
+                              text:
+                                  "House Number: ${_fetchedTransactionData!['houseLotBlk']}"),
+                          BodyMediumText(
+                              text:
+                                  "Barangay: ${_fetchedTransactionData!['barangay']}"),
+                          BodyMediumOver(
+                              text:
+                                  "Delivery Location: ${_fetchedTransactionData!['deliveryLocation']}"),
+                          const Divider(),
+                          BodyMediumText(
+                              text:
+                                  'Payment Method: ${_fetchedTransactionData!['paymentMethod'] == 'COD' ? 'Cash on Delivery' : _fetchedTransactionData!['paymentMethod']}'),
+                          if (_fetchedTransactionData!
+                              .containsKey('discountIdImage'))
+                            BodyMediumText(
+                              text:
+                                  'Assemble Option: ${_fetchedTransactionData!['assembly'] ? 'Yes' : 'No'}',
+                            ),
+                          BodyMediumOver(
+                            text:
+                                'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a').format(DateTime.parse(_fetchedTransactionData!['deliveryDate']))}',
+                          ),
+                          const Divider(),
+                          if (_fetchedTransactionData!
+                              .containsKey('discountIdImage'))
+                            BodyMediumOver(
+                              text:
+                                  'Items: ${_fetchedTransactionData!['items']!.map((item) {
+                                if (item is Map<String, dynamic> &&
+                                    item.containsKey('name') &&
+                                    item.containsKey('quantity') &&
+                                    item.containsKey('customerPrice')) {
+                                  final itemName = item['name'];
+                                  final quantity = item['quantity'];
+                                  final price = NumberFormat.decimalPattern()
+                                      .format(double.parse(
+                                          (item['customerPrice'])
+                                              .toStringAsFixed(2)));
 
-                            Spacer(), // Adjustable space
-                          ],
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Payment Method: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${_fetchedTransactionData!['paymentMethod']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
+                                  return '$itemName ₱$price (x$quantity)';
+                                }
+                              }).join(', ')}',
+                            ),
+                          if (!_fetchedTransactionData!
+                                  .containsKey('discountIdImage') &&
+                              _fetchedTransactionData!['discounted'] == false)
+                            BodyMediumOver(
+                              text:
+                                  'Items: ${_fetchedTransactionData!['items']!.map((item) {
+                                if (item is Map<String, dynamic> &&
+                                    item.containsKey('name') &&
+                                    item.containsKey('quantity') &&
+                                    item.containsKey('retailerPrice')) {
+                                  final itemName = item['name'];
+                                  final quantity = item['quantity'];
+                                  final price = NumberFormat.decimalPattern()
+                                      .format(double.parse(
+                                          (item['retailerPrice'])
+                                              .toStringAsFixed(2)));
+
+                                  return '$itemName ₱$price (x$quantity)';
+                                }
+                              }).join(', ')}',
+                            ),
+                          BodyMediumText(
+                            text:
+                                'Total: ₱${NumberFormat.decimalPattern().format(double.parse((_fetchedTransactionData!['total']).toStringAsFixed(2)))}',
                           ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Assemble Option: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    _fetchedTransactionData!['assembly'] != null
-                                        ? (_fetchedTransactionData!['assembly']
-                                            ? 'Yes'
-                                            : 'No')
-                                        : 'N/A',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Items: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (_fetchedTransactionData!['items'] != null)
-                                TextSpan(
-                                  text: (_fetchedTransactionData!['items']
-                                          as List)
-                                      .map((item) {
-                                    if (item is Map<String, dynamic> &&
-                                        item.containsKey('name') &&
-                                        item.containsKey('quantity')) {
-                                      return '${item['name']} (${item['quantity']})';
-                                    }
-                                    return '';
-                                  }).join(', '),
-                                ),
-                            ],
-                          ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: "Total Price: ",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '₱${_fetchedTransactionData!['total']}',
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Ordered By: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text: '${_fetchedTransactionData!['name']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Ordered By Contact Number: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text:
-                                    '${_fetchedTransactionData!['contactNumber']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Delivery Date/Time: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              TextSpan(
-                                text: _fetchedTransactionData!['updatedAt'] !=
-                                        null
-                                    ? DateFormat('MMM d, y - h:mm a').format(
-                                        DateTime.parse(_fetchedTransactionData![
-                                            'updatedAt']),
-                                      )
-                                    : 'null',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  : Center(
-                      child: CircularProgressIndicator(),
-                    ),
-            ),
+                        ],
+                      )),
           ),
         ],
       ),

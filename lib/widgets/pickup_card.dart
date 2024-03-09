@@ -64,13 +64,6 @@ class _PickedUpCardState extends State<PickedUpCard> {
     }
   }
 
-  void _deleteImage() {
-    setState(() {
-      _image = null;
-      isImageSelected = false;
-    });
-  }
-
   Future<Map<String, dynamic>?> _uploadImage(File imageFile) async {
     try {
       var request = http.MultipartRequest(
@@ -230,7 +223,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
     try {
       if (!_googleMapsLaunched) {
         _googleMapsLaunched = true;
-        await Future.delayed(const Duration(seconds: 5));
+        await Future.delayed(const Duration(seconds: 1));
         await MapsLauncher.launchCoordinates(latitude, longitude);
 
         await _updateTransaction(widget.transactionData['_id']);
@@ -319,10 +312,10 @@ class _PickedUpCardState extends State<PickedUpCard> {
                         text:
                             'Assemble Option: ${widget.transactionData['assembly'] ? 'Yes' : 'No'}',
                       ),
-                    BodyMediumOver(
-                      text:
-                          'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a').format(DateTime.parse(widget.transactionData['deliveryDate']))}',
-                    ),
+                    // BodyMediumOver(
+                    //   text:
+                    //       'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a').format(DateTime.parse(widget.transactionData['deliveryDate']))}',
+                    // ),
                     const Divider(),
                     if (widget.transactionData.containsKey('discountIdImage'))
                       BodyMediumOver(
@@ -338,7 +331,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
                                 double.parse((item['customerPrice'])
                                     .toStringAsFixed(2)));
 
-                            return '$itemName (₱$price x $quantity)';
+                            return '$itemName ₱$price (x$quantity)';
                           }
                         }).join(', ')}',
                       ),
@@ -358,7 +351,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
                                 double.parse((item['retailerPrice'])
                                     .toStringAsFixed(2)));
 
-                            return '$itemName (₱$price x $quantity)';
+                            return '$itemName ₱$price (x$quantity)';
                           }
                         }).join(', ')}',
                       ),

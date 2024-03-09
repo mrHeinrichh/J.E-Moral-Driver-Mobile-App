@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:driver_app/routes/app_routes.dart';
-import 'package:driver_app/widgets/payment_details.dart';
+import 'package:driver_app/view/user_provider.dart';
+import 'package:driver_app/widgets/custom_text.dart';
+import 'package:driver_app/widgets/fullscreen_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:driver_app/widgets/custom_button.dart';
@@ -10,6 +12,8 @@ import 'dart:async';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 
 class DropOffPage extends StatefulWidget {
   final VoidCallback? onPressed;
@@ -21,14 +25,10 @@ class DropOffPage extends StatefulWidget {
 }
 
 class _DropOffPageState extends State<DropOffPage> {
-  final TextStyle customTextStyle = const TextStyle(
-    fontSize: 11,
-    fontWeight: FontWeight.bold,
-    color: Color(0xFF8D9DAE),
-  );
   File? _image;
   bool _imageCaptured = false;
   String? selectedPayment;
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -100,17 +100,16 @@ class _DropOffPageState extends State<DropOffPage> {
           var decodedResponse = json.decode(responseBody);
           print('Upload success: $decodedResponse');
 
-          // Extract the path from the response
           String pickupImagePath = decodedResponse['data'][0]['path'];
 
-          return pickupImagePath; // Return the pickupImagePath
+          return pickupImagePath;
         } else {
           print('Upload failed with status ${response.statusCode}');
-          return ''; // Handle failure appropriately
+          return '';
         }
       } catch (error) {
         print('Error uploading image: $error');
-        return ''; // Handle error appropriately
+        return '';
       }
     }
 
@@ -119,21 +118,42 @@ class _DropOffPageState extends State<DropOffPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Success"),
-            content: Text("Have you dropped off the following delivery?"),
+            title: const Center(
+              child: Text(
+                'Success!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            content: const Text(
+              "Have you dropped off the following delivery?",
+              textAlign: TextAlign.center,
+            ),
             actions: [
               TextButton(
                 onPressed: () {
-                  // Close the dialog
                   Navigator.of(context).pop();
                 },
-                child: Text("Cancel"),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF050404).withOpacity(0.8),
+                ),
+                child: const Text("Cancel"),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, homeRoute);
                 },
-                child: Text("Okay"),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF050404).withOpacity(0.9),
+                ),
+                child: const Text(
+                  "Yes",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           );
@@ -174,412 +194,448 @@ class _DropOffPageState extends State<DropOffPage> {
       }
     }
 
+    Future<Map<String, dynamic>> fetchRider(String riderId) async {
+      final response = await http.get(
+        Uri.parse(
+          'https://lpg-api-06n8.onrender.com/api/v1/users/?filter={"_id":"$riderId","__t":"Rider"}',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['data'] != null && data['data'].isNotEmpty) {
+          final riderData = data['data'][0] as Map<String, dynamic>;
+          return riderData;
+        } else {
+          throw Exception('Rider not found');
+        }
+      } else {
+        throw Exception('Failed to load data from the API');
+      }
+    }
+
     return Scaffold(
-      backgroundColor: Color(0xFFe7e0e0),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
+        elevation: 1,
         title: const Text(
           'Drop Off Payment',
           style: TextStyle(
             color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFFd41111),
         centerTitle: true,
-        automaticallyImplyLeading: false,
+        actions: [
+          Consumer<UserProvider>(
+            builder: (context, userProvider, child) {
+              return IconButton(
+                icon: const Icon(
+                  Icons.refresh,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  String? userId = userProvider.userId;
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Center(
+                        child: LoadingAnimationWidget.flickr(
+                          leftDotColor:
+                              const Color(0xFF050404).withOpacity(0.8),
+                          rightDotColor:
+                              const Color(0xFFd41111).withOpacity(0.8),
+                          size: 40,
+                        ),
+                      );
+                    },
+                  );
+                  await fetchRider(userId!);
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
+        ],
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            DriverInformation(
-              customTextStyle: customTextStyle,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(28, 5, 28, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    "E-Wallet Driver Information",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF050404).withOpacity(0.9),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Consumer<UserProvider>(
+                    builder: (context, userProvider, child) {
+                      String? userId = userProvider.userId;
+                      return FutureBuilder<Map<String, dynamic>>(
+                        future: fetchRider(userId!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: LoadingAnimationWidget.flickr(
+                                leftDotColor:
+                                    const Color(0xFF050404).withOpacity(0.8),
+                                rightDotColor:
+                                    const Color(0xFFd41111).withOpacity(0.8),
+                                size: 40,
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            Map<String, dynamic> riderData = snapshot.data!;
+                            return SizedBox(
+                              width: 320,
+                              child: Card(
+                                color: Colors.white,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(25, 10, 25, 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) =>
+                                                FullScreenImageView(
+                                                    imageUrl:
+                                                        riderData['gcashQr'],
+                                                    onClose: () =>
+                                                        Navigator.of(context)
+                                                            .pop()),
+                                          ));
+                                        },
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Container(
+                                            width: double.infinity,
+                                            height: 100,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(
+                                                  riderData['gcashQr'] ?? '',
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      BodyMediumOver(
+                                        text:
+                                            "Gcash Name: ${riderData['name']}",
+                                      ),
+                                      BodyMediumText(
+                                        text:
+                                            "GCash Number: ${riderData['gcash']}",
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(28, 0, 28, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Pickup Details",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF5E738A),
+                      color: const Color(0xFF050404).withOpacity(0.9),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
                     child: Card(
+                      color: Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text.rich(
-                              TextSpan(
+                            Center(
+                              child: Column(
                                 children: [
-                                  TextSpan(
-                                    text: "Transaction ID: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
+                                  const BodyMedium(
+                                    text: "Transaction ID:",
                                   ),
-                                  TextSpan(
-                                    text: '${transactionData['_id']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
+                                  BodyMedium(
+                                    text: transactionData['_id'],
                                   ),
                                 ],
                               ),
                             ),
-                            Divider(
-                              color: Colors.black,
+                            const Divider(),
+                            BodyMediumText(
+                              text:
+                                  transactionData.containsKey('discountIdImage')
+                                      ? 'Ordered by: Customer'
+                                      : transactionData['discounted'] == false
+                                          ? 'Ordered by: Retailer'
+                                          : '',
                             ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Receiver Name: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${transactionData['name']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
+                            if (transactionData.containsKey('discountIdImage'))
+                              BodyMediumText(
+                                text: transactionData['discountIdImage'] !=
+                                            null &&
+                                        transactionData['discountIdImage'] != ""
+                                    ? 'Discounted: Yes'
+                                    : 'Discounted: No',
                               ),
+                            const SizedBox(height: 5),
+                            BodyMediumText(
+                                text:
+                                    "Order Status: ${transactionData['status']}"),
+                            const Divider(),
+                            const Center(
+                              child: BodyMedium(text: "Receiver Infomation"),
                             ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Receiver Contact Number: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${transactionData['contactNumber']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
+                            const SizedBox(height: 5),
+                            BodyMediumText(
+                                text: "Name: ${transactionData['name']}"),
+                            BodyMediumText(
+                                text:
+                                    "Mobile Number: ${transactionData['contactNumber']}"),
+                            BodyMediumOver(
+                                text:
+                                    "House Number: ${transactionData['houseLotBlk']}"),
+                            BodyMediumText(
+                                text:
+                                    "Barangay: ${transactionData['barangay']}"),
+                            BodyMediumOver(
+                                text:
+                                    "Delivery Location: ${transactionData['deliveryLocation']}"),
+                            const Divider(),
+                            BodyMediumText(
+                                text:
+                                    'Payment Method: ${transactionData['paymentMethod'] == 'COD' ? 'Cash on Delivery' : transactionData['paymentMethod']}'),
+                            if (transactionData.containsKey('discountIdImage'))
+                              BodyMediumText(
+                                text:
+                                    'Assemble Option: ${transactionData['assembly'] ? 'Yes' : 'No'}',
                               ),
+                            BodyMediumOver(
+                              text:
+                                  'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a').format(DateTime.parse(transactionData['deliveryDate']))}',
                             ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Pin Location: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        '${transactionData['deliveryLocation']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "House#/Lot/Blk:",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${transactionData['houseLotBlk']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: "Barangay: ",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF050404),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: '${transactionData['barangay']}',
-                                        style:
-                                            TextStyle(color: Color(0xFF050404)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                            const Divider(),
+                            if (transactionData.containsKey('discountIdImage'))
+                              BodyMediumOver(
+                                text:
+                                    'Items: ${transactionData['items']!.map((item) {
+                                  if (item is Map<String, dynamic> &&
+                                      item.containsKey('name') &&
+                                      item.containsKey('quantity') &&
+                                      item.containsKey('customerPrice')) {
+                                    final itemName = item['name'];
+                                    final quantity = item['quantity'];
+                                    final price = NumberFormat.decimalPattern()
+                                        .format(double.parse(
+                                            (item['customerPrice'])
+                                                .toStringAsFixed(2)));
 
-                                Spacer(), // Adjustable space
-                              ],
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Payment Method: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${transactionData['paymentMethod']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
+                                    return '$itemName ₱$price (x$quantity)';
+                                  }
+                                }).join(', ')}',
                               ),
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Assemble Option: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: transactionData['assembly'] != null
-                                        ? (transactionData['assembly']
-                                            ? 'Yes'
-                                            : 'No')
-                                        : 'N/A',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
+                            if (!transactionData
+                                    .containsKey('discountIdImage') &&
+                                transactionData['discounted'] == false)
+                              BodyMediumOver(
+                                text:
+                                    'Items: ${transactionData['items']!.map((item) {
+                                  if (item is Map<String, dynamic> &&
+                                      item.containsKey('name') &&
+                                      item.containsKey('quantity') &&
+                                      item.containsKey('retailerPrice')) {
+                                    final itemName = item['name'];
+                                    final quantity = item['quantity'];
+                                    final price = NumberFormat.decimalPattern()
+                                        .format(double.parse(
+                                            (item['retailerPrice'])
+                                                .toStringAsFixed(2)));
+
+                                    return '$itemName ₱$price (x$quantity)';
+                                  }
+                                }).join(', ')}',
                               ),
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Items: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (transactionData['items'] != null)
-                                    TextSpan(
-                                      text: (transactionData['items'] as List)
-                                          .map((item) {
-                                        if (item is Map<String, dynamic> &&
-                                            item.containsKey('name') &&
-                                            item.containsKey('quantity')) {
-                                          return '${item['name']} (${item['quantity']})';
-                                        }
-                                        return '';
-                                      }).join(', '),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: "Total Price: ",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '₱${transactionData['total']}',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Divider(
-                              color: Colors.black,
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Ordered By: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${transactionData['name']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Ordered By Contact Number: ",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF050404),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${transactionData['contactNumber']}',
-                                    style: TextStyle(color: Color(0xFF050404)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'Delivery Date/Time: ',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: transactionData['updatedAt'] != null
-                                        ? DateFormat('MMM d, y - h:mm a')
-                                            .format(
-                                            DateTime.parse(
-                                                transactionData['updatedAt']),
-                                          )
-                                        : 'null',
-                                  ),
-                                ],
-                              ),
+                            BodyMediumText(
+                              text:
+                                  'Total: ₱${NumberFormat.decimalPattern().format(double.parse((transactionData['total']).toStringAsFixed(2)))}',
                             ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      if (_imageCaptured) {
-                        _deleteImage();
-                      } else {
-                        _getImageFromCamera();
-                      }
-                    },
-                    child: Stack(
-                      children: [
-                        _imageCaptured
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 2.0,
+                  const SizedBox(height: 5),
+                  Card(
+                    color: Colors.white,
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 25, 15, 25),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    if (_imageCaptured) {
+                                      _deleteImage();
+                                    } else {
+                                      _getImageFromCamera();
+                                    }
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      _imageCaptured
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey,
+                                                  width: 2.0,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(6.0),
+                                                child: Image.file(
+                                                  _image!,
+                                                  width: double.infinity,
+                                                  height: 100.0,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            )
+                                          : Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey,
+                                                  width: 2.0,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                              child: Stack(
+                                                children: [
+                                                  Container(
+                                                    height: 100,
+                                                    child: Center(
+                                                      child: Icon(
+                                                        Icons.camera_alt,
+                                                        color: const Color(
+                                                                0xFF050404)
+                                                            .withOpacity(0.6),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                      Positioned(
+                                        top: 5,
+                                        right: 5,
+                                        child: _imageCaptured
+                                            ? IconButton(
+                                                onPressed: _deleteImage,
+                                                icon: const Icon(
+                                                  Icons.close,
+                                                  color: Colors.red,
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                      ),
+                                    ],
                                   ),
-                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                  child: Image.file(
-                                    _image!,
-                                    width: double.infinity,
-                                    height: 100.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: 100,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          color: Color(0xFF5E738A),
-                                        ),
+                                const SizedBox(height: 10),
+                                DropdownButtonFormField(
+                                  value: selectedPayment,
+                                  decoration: InputDecoration(
+                                    labelText: 'Mode of Payment:',
+                                    labelStyle: TextStyle(
+                                      color: const Color(0xFF050404)
+                                          .withOpacity(0.9),
+                                    ),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: const Color(0xFF050404)
+                                            .withOpacity(0.9),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                        Positioned(
-                          top: 5,
-                          right: 5,
-                          child: _imageCaptured
-                              ? IconButton(
-                                  onPressed: _deleteImage,
-                                  icon: Icon(
-                                    Icons.close,
-                                    color: Colors.red,
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: const Color(0xFF050404)
+                                            .withOpacity(0.9),
+                                      ),
+                                    ),
                                   ),
-                                )
-                              : SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(28, 10, 28, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Mode of Payment",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5E738A),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: DropdownButtonFormField<String>(
-                      value: selectedPayment,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedPayment = newValue;
-                        });
-                      },
-                      items: <String?>['COD', 'GCASH']
-                          .map<DropdownMenuItem<String>>((String? value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value ?? ''),
-                        );
-                      }).toList(),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        isDense: true,
-                        hintText: 'Select a Mode of Payment:', // Default text
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'COD',
+                                      child: Text('Cash on Delivery'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'GCASH',
+                                      child: Text('GCASH'),
+                                    ),
+                                  ],
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedPayment = newValue;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please Select the Mode of Payment";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -594,33 +650,26 @@ class _DropOffPageState extends State<DropOffPage> {
                     text: 'CONFIRM PAYMENT',
                     onPressed: () async {
                       if (_image != null) {
-                        String pickupImagePath = await _uploadImage(_image!);
-                        _updateTransaction(
-                          transactionData['_id'],
-                          pickupImagePath,
-                          selectedPayment ?? '',
-                        );
+                        if (formKey.currentState!.validate()) {
+                          String pickupImagePath = await _uploadImage(_image!);
+                          _updateTransaction(
+                            transactionData['_id'],
+                            pickupImagePath,
+                            selectedPayment ?? '',
+                          );
 
-                        // Show the success dialog
-                        _showSuccessDialog();
+                          _showSuccessDialog();
 
-                        if (widget.onPressed != null) {
-                          widget.onPressed!();
+                          if (widget.onPressed != null) {
+                            widget.onPressed!();
+                          }
                         }
                       } else {
-                        print('No image captured.');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('No image captured.'),
-                            duration: Duration(
-                                seconds:
-                                    2), // Set the duration for the snackbar
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        showCustomOverlay(context, 'Please Upload the Payment');
                       }
                     },
-                    backgroundColor: Colors.red,
+                    backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
+                    color: Colors.white,
                   ),
                 ],
               ),
@@ -631,4 +680,42 @@ class _DropOffPageState extends State<DropOffPage> {
       ),
     );
   }
+}
+
+void showCustomOverlay(BuildContext context, String message) {
+  final overlay = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).size.height * 0.5,
+      left: 20,
+      right: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            color: const Color(0xFFd41111).withOpacity(0.7),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Text(
+            message,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Overlay.of(context)!.insert(overlay);
+
+  Future.delayed(const Duration(seconds: 2), () {
+    overlay.remove();
+  });
 }

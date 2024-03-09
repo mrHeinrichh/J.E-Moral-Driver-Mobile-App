@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
           'Deliveries',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -69,6 +69,53 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
+        leading: IconButton(
+          icon: const Icon(Icons.power_settings_new_rounded),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Center(
+                    child: Text(
+                      'Logout Confirmation',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  content: const Text(
+                    'Are you sure you want to logout?',
+                    textAlign: TextAlign.center,
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor:
+                            const Color(0xFF050404).withOpacity(0.8),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _logout(context);
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor:
+                            const Color(0xFFd41111).withOpacity(0.8),
+                      ),
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
       backgroundColor: Colors.white,
       body: transactions == null
@@ -82,4 +129,8 @@ class _HomePageState extends State<HomePage> {
           : CustomTabBar(transactions: transactions!),
     );
   }
+}
+
+void _logout(BuildContext context) {
+  Navigator.pushNamed(context, '/login');
 }

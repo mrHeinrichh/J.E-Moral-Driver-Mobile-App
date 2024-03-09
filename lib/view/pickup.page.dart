@@ -10,20 +10,18 @@ class PickUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
         elevation: 1,
         title: const Text(
           'Pick Up Deliveries',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

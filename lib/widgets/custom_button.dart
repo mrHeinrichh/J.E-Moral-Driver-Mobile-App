@@ -31,11 +31,13 @@ class SpareButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final Color backgroundColor;
+  final Color color;
 
   SpareButton({
     required this.text,
     required this.onPressed,
     required this.backgroundColor,
+    required this.color,
   });
 
   @override
@@ -46,16 +48,17 @@ class SpareButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 60.0),
-          backgroundColor: Colors.white,
+          backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: color,
           ),
         ),
       ),
