@@ -55,6 +55,7 @@ class CustomTabBar extends StatelessWidget {
                 ),
                 child: TabBar(
                   isScrollable: false,
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
                   tabs: [
                     Container(
                       height: 30,
@@ -91,7 +92,7 @@ class CustomTabBar extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
-                    color: const Color(0xFFBD2019),
+                    color: const Color(0xFFA81616).withOpacity(0.8),
                   ),
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.white,
@@ -124,7 +125,7 @@ class CustomTabBar extends StatelessWidget {
                                 );
                               }
                             },
-                            btncolor: Color(0xFFBD2019),
+                            btncolor: const Color(0xFFA81616).withOpacity(0.8),
                             transactionData: transaction,
                           ),
                       ],
@@ -137,11 +138,9 @@ class CustomTabBar extends StatelessWidget {
                           OnGoingCard(
                             buttonText: 'Retry',
                             onPressed: () async {
-                              // Retrieve the transaction ID
                               String? transactionId = transaction['_id'];
 
                               if (transactionId != null) {
-                                // Call the function to update the transaction status
                                 await updateTransactionStatus(
                                     transactionId, userId!);
 
@@ -155,7 +154,7 @@ class CustomTabBar extends StatelessWidget {
                                 );
                               }
                             },
-                            btncolor: Color(0xFFBD2019),
+                            btncolor: const Color(0xFFA81616).withOpacity(0.8),
                             transactionData: transaction,
                           ),
                       ],

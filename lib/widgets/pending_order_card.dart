@@ -1,3 +1,4 @@
+import 'package:driver_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:driver_app/widgets/card_button.dart';
 import 'package:intl/intl.dart';
@@ -27,269 +28,110 @@ class PendingOrderCard extends StatelessWidget {
       child: Column(
         children: [
           Visibility(
-            // visible: isPending && !isCompleted && !pickedUp,
+            visible: isPending && !isCompleted && !pickedUp,
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text.rich(
-                      TextSpan(
+                    Center(
+                      child: Column(
                         children: [
-                          TextSpan(
-                            text: "Transaction ID: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
+                          const BodyMedium(
+                            text: "Transaction ID:",
                           ),
-                          TextSpan(
-                            text: '${transactionData['_id']}',
-                            style: TextStyle(color: Color(0xFF050404)),
+                          BodyMedium(
+                            text: transactionData['_id'],
                           ),
                         ],
                       ),
                     ),
-                    Divider(
-                      color: Colors.black,
-                    ),
-                    Text.rich(
-                      TextSpan(
+                    const Divider(),
+                    if (!transactionData.containsKey('discountIdImage') &&
+                        transactionData['discounted'] == false)
+                      const BodyMediumText(text: "Ordered by: Retailer"),
+                    if (transactionData['discountIdImage'] != null &&
+                        transactionData['discountIdImage'] != "")
+                      const Column(
                         children: [
-                          TextSpan(
-                            text: "Receiver Name: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['name']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
+                          BodyMediumText(text: "Ordered by: Customer"),
+                          BodyMediumText(text: "Discounted: Yes"),
                         ],
                       ),
+                    BodyMediumText(
+                        text: "Order Status: ${transactionData['status']}"),
+                    const Divider(),
+                    const Center(
+                      child: BodyMedium(text: "Receiver Infomation"),
                     ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Receiver Contact Number: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['contactNumber']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
+                    const SizedBox(height: 5),
+                    BodyMediumText(text: "Name: ${transactionData['name']}"),
+                    BodyMediumText(
+                        text:
+                            "Mobile Number: ${transactionData['contactNumber']}"),
+                    BodyMediumOver(
+                        text:
+                            "House Number: ${transactionData['houseLotBlk']}"),
+                    BodyMediumText(
+                        text: "Barangay: ${transactionData['barangay']}"),
+                    BodyMediumOver(
+                        text:
+                            "Delivery Location: ${transactionData['deliveryLocation']}"),
+                    const Divider(),
+                    BodyMediumText(
+                        text:
+                            'Payment Method: ${transactionData['paymentMethod'] == 'COD' ? 'Cash on Delivery' : transactionData['paymentMethod']}'),
+                    if (transactionData.containsKey('discountIdImage'))
+                      BodyMediumText(
+                        text:
+                            'Assemble Option: ${transactionData['assembly'] ? 'Yes' : 'No'}',
                       ),
+                    BodyMediumOver(
+                      text:
+                          'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a').format(DateTime.parse(transactionData['deliveryDate']))}',
                     ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Pin Location: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['deliveryLocation']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
+                    const Divider(),
+                    if (transactionData.containsKey('discountIdImage'))
+                      BodyMediumOver(
+                        text: 'Items: ${transactionData['items']!.map((item) {
+                          if (item is Map<String, dynamic> &&
+                              item.containsKey('name') &&
+                              item.containsKey('quantity') &&
+                              item.containsKey('customerPrice')) {
+                            final itemName = item['name'];
+                            final quantity = item['quantity'];
+                            final price = NumberFormat.decimalPattern().format(
+                                double.parse((item['customerPrice'])
+                                    .toStringAsFixed(2)));
+
+                            return '$itemName (₱$price x $quantity)';
+                          }
+                        }).join(', ')}',
                       ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "House#/Lot/Blk:",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['houseLotBlk']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
+                    if (!transactionData.containsKey('discountIdImage') &&
+                        transactionData['discounted'] == false)
+                      BodyMediumOver(
+                        text: 'Items: ${transactionData['items']!.map((item) {
+                          if (item is Map<String, dynamic> &&
+                              item.containsKey('name') &&
+                              item.containsKey('quantity') &&
+                              item.containsKey('retailerPrice')) {
+                            final itemName = item['name'];
+                            final quantity = item['quantity'];
+                            final price = NumberFormat.decimalPattern().format(
+                                double.parse((item['retailerPrice'])
+                                    .toStringAsFixed(2)));
+
+                            return '$itemName (₱$price x $quantity)';
+                          }
+                        }).join(', ')}',
                       ),
+                    BodyMediumText(
+                      text:
+                          'Total: ₱${NumberFormat.decimalPattern().format(double.parse((transactionData['total']).toStringAsFixed(2)))}',
                     ),
-                    Row(
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Barangay: ",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF050404),
-                                ),
-                              ),
-                              TextSpan(
-                                text: '${transactionData['barangay']}',
-                                style: TextStyle(color: Color(0xFF050404)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Payment Method: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['paymentMethod']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Assemble Option: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: transactionData['assembly'] != null
-                                ? (transactionData['assembly'] ? 'Yes' : 'No')
-                                : 'N/A',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Items: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (transactionData['items'] != null)
-                            TextSpan(
-                              text: (transactionData['items'] as List)
-                                  .map((item) {
-                                if (item is Map<String, dynamic> &&
-                                    item.containsKey('name') &&
-                                    item.containsKey('quantity')) {
-                                  return '${item['name']} (${item['quantity']})';
-                                }
-                                return '';
-                              }).join(', '),
-                            ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: "Total Price: ",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '₱${transactionData['total']}',
-                              ),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
-                        Text(
-                          "Status: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        Text(
-                          "${transactionData['status']}",
-                        ),
-                      ],
-                    ),
-                    Divider(
-                      color: Colors.black,
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Ordered By: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['name']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Ordered By Contact Number: ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF050404),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '${transactionData['contactNumber']}',
-                            style: TextStyle(color: Color(0xFF050404)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Delivery Date/Time: ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: transactionData['updatedAt'] != null
-                                ? DateFormat('MMM d, y - h:mm a').format(
-                                    DateTime.parse(
-                                        transactionData['updatedAt']),
-                                  )
-                                : 'null',
-                          ),
-                        ],
-                      ),
-                    ),
+                    const SizedBox(height: 10),
                     CardButton(
                       text: buttonText,
                       onPressed: onPressed,
