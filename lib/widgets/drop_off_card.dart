@@ -1,23 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:driver_app/utils/productFormat.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'dart:math' as Math;
 import 'package:intl/intl.dart';
 
 class DropOffCard extends StatefulWidget {
-  final TextStyle customTextStyle;
   final String buttonText;
   final VoidCallback onPressed;
   final Color btncolor;
   final Map<String, dynamic> transactionData;
 
   DropOffCard({
-    required this.customTextStyle,
     required this.buttonText,
     required this.onPressed,
     required this.btncolor,

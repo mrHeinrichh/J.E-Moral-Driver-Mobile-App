@@ -1,6 +1,6 @@
 import 'package:driver_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/widgets/custom_button.dart';
 import 'package:intl/intl.dart';
 
 class PendingOrderCard extends StatelessWidget {

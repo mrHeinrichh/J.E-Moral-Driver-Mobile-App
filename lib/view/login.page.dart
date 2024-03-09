@@ -1,6 +1,6 @@
 import 'package:driver_app/routes/app_routes.dart';
 import 'package:driver_app/view/user_provider.dart';
-import 'package:driver_app/widgets/login_button.dart';
+import 'package:driver_app/widgets/custom_button.dart';
 import 'package:driver_app/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

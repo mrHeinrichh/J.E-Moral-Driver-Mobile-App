@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../widgets/payment_details.dart';
-import '../widgets/card_button.dart';
-// import '../routes/app_routes.dart';
 
 class PaymentPage extends StatelessWidget {
   final TextStyle customTextStyle = const TextStyle(

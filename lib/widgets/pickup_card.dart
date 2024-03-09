@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:driver_app/utils/productFormat.dart';
-import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -10,18 +8,15 @@ import 'dart:async';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/services.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:driver_app/utils/DateTime.dart' as myUtils;
 import 'package:intl/intl.dart';
 
 class PickedUpCard extends StatefulWidget {
-  final TextStyle customTextStyle;
   final String buttonText;
   final VoidCallback onPressed;
   final Color btncolor;
   final Map<String, dynamic> transactionData;
 
   PickedUpCard({
-    required this.customTextStyle,
     required this.buttonText,
     required this.onPressed,
     required this.btncolor,
@@ -35,7 +30,8 @@ class PickedUpCard extends StatefulWidget {
 class _PickedUpCardState extends State<PickedUpCard> {
   File? _image;
   bool _imageCaptured = false;
-  bool _googleMapsLaunched = false; // Add this flag
+
+  bool _googleMapsLaunched = false;
 
   Future<void> _getImageFromCamera() async {
     final pickedFile =
@@ -52,12 +48,10 @@ class _PickedUpCardState extends State<PickedUpCard> {
   Future<void> _launchGoogleMaps(double latitude, double longitude) async {
     try {
       if (!_googleMapsLaunched) {
-        // Check the flag
-        _googleMapsLaunched = true; // Set the flag to true
+        _googleMapsLaunched = true;
         await Future.delayed(Duration(seconds: 5));
         await MapsLauncher.launchCoordinates(latitude, longitude);
 
-        // Launch was successful, call _updateTransaction
         await _updateTransaction(
           widget.transactionData['_id'],
           widget.transactionData['pickupImages'],
@@ -120,24 +114,22 @@ class _PickedUpCardState extends State<PickedUpCard> {
         var decodedResponse = json.decode(responseBody);
         print('Upload success: $decodedResponse');
 
-        // Extract the path from the response
         String pickupImagePaths = decodedResponse['data'][0]['path'];
 
-        return pickupImagePaths; // Return the pickupImagePaths
+        return pickupImagePaths;
       } else {
         print('Upload failed with status ${response.statusCode}');
-        return ''; // Handle failure appropriately
+        return '';
       }
     } catch (error) {
       print('Error uploading image: $error');
-      return ''; // Handle error appropriately
+      return '';
     }
   }
 
   Future<void> _updateTransaction(
       String transactionId, String pickupImagePaths) async {
     try {
-      // Geocode the delivery location to get latitude and longitude
       String deliveryLocation = widget.transactionData['deliveryLocation'];
       List<double> coordinates = await _geocodeAddress(deliveryLocation);
 
@@ -145,7 +137,6 @@ class _PickedUpCardState extends State<PickedUpCard> {
         double deliveryLocationLatitude = coordinates[0];
         double deliveryLocationLongitude = coordinates[1];
 
-        // Update the transaction data
         Map<String, dynamic> updateData = {
           "pickupImages": pickupImagePaths,
           "pickedUp": true,
@@ -153,7 +144,6 @@ class _PickedUpCardState extends State<PickedUpCard> {
           "status": "On Going",
         };
 
-        // Patch request to update the transaction
         final String apiUrl =
             'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId';
         final http.Response response = await http.patch(
@@ -167,7 +157,6 @@ class _PickedUpCardState extends State<PickedUpCard> {
           print('Response: ${response.body}');
           print(response.statusCode);
 
-          // Launch Google Maps with the obtained coordinates
           await _launchGoogleMaps(
               deliveryLocationLatitude, deliveryLocationLongitude);
 

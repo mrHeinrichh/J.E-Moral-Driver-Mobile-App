@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:driver_app/routes/app_routes.dart';
-import 'package:driver_app/utils/productFormat.dart';
 import 'package:driver_app/widgets/payment_details.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/widgets/custom_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:http_parser/http_parser.dart';

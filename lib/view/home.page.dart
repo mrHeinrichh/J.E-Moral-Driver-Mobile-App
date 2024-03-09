@@ -1,4 +1,3 @@
-import 'package:driver_app/widgets/drawer.dart';
 import 'package:driver_app/widgets/tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Map<String, dynamic>> transactions = [];
+  List<Map<String, dynamic>>? transactions;
 
   @override
   void initState() {
@@ -19,15 +18,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchData() async {
-    final Uri url =
-        Uri.parse('https://lpg-api-06n8.onrender.com/api/v1/transactions');
+    final Uri url = Uri.parse(
+        'https://lpg-api-06n8.onrender.com/api/v1/transactions?filter={"__t":"Delivery"}');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       if (jsonResponse.containsKey('data')) {
         final List<dynamic> transactionsData = jsonResponse['data'];
-        transactions = transactionsData.cast<Map<String, dynamic>>();
+        setState(() {
+          transactions = transactionsData.cast<Map<String, dynamic>>();
+        });
       } else {
         throw Exception('Invalid response format: Missing "data" key');
       }
@@ -75,7 +76,6 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
-      drawer: CustomDrawer(),
       body: transactions == null
           ? Center(child: CircularProgressIndicator())
           : CustomTabBar(transactions: transactions!),

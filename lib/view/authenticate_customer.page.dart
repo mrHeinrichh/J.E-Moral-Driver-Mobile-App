@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:driver_app/widgets/card_button.dart';
+import 'package:driver_app/widgets/custom_button.dart';
 import 'package:driver_app/widgets/drop_off_card.dart';
 
 class AuthenticatePage extends StatefulWidget {
@@ -17,12 +17,6 @@ class AuthenticatePage extends StatefulWidget {
   @override
   _AuthenticatePageState createState() => _AuthenticatePageState();
 }
-
-const TextStyle customTextStyle = TextStyle(
-  fontSize: 12,
-  fontWeight: FontWeight.bold,
-  color: Color(0xFF8D9DAE),
-);
 
 class _AuthenticatePageState extends State<AuthenticatePage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -202,7 +196,6 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
           ),
         ),
         actions: [
-          // Add a refresh icon button
           IconButton(
             icon: const Icon(
               Icons.refresh,
@@ -218,11 +211,9 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        // Wrap your body with SingleChildScrollView
         child: Column(
           children: [
             DropOffCard(
-              customTextStyle: customTextStyle,
               buttonText: 'Disregard this',
               onPressed: () {},
               btncolor: const Color(0xFF5E738A),

@@ -1,8 +1,8 @@
 import 'package:driver_app/view/pickup.page.dart';
 import 'package:driver_app/view/user_provider.dart';
-import 'package:driver_app/widgets/completed_card.dart';
-import 'package:driver_app/widgets/pending_order_card.dart';
-import 'package:driver_app/widgets/on_going_card.dart';
+import 'package:driver_app/widgets/card_completedOrders.dart';
+import 'package:driver_app/widgets/card_pendingOrders.dart';
+import 'package:driver_app/widgets/card_ongoingOrders.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
