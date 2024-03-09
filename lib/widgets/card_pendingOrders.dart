@@ -30,6 +30,7 @@ class PendingOrderCard extends StatelessWidget {
           Visibility(
             visible: isPending && !isCompleted && !pickedUp,
             child: Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
                 child: Column(
@@ -48,17 +49,21 @@ class PendingOrderCard extends StatelessWidget {
                       ),
                     ),
                     const Divider(),
-                    if (!transactionData.containsKey('discountIdImage') &&
-                        transactionData['discounted'] == false)
-                      const BodyMediumText(text: "Ordered by: Retailer"),
-                    if (transactionData['discountIdImage'] != null &&
-                        transactionData['discountIdImage'] != "")
-                      const Column(
-                        children: [
-                          BodyMediumText(text: "Ordered by: Customer"),
-                          BodyMediumText(text: "Discounted: Yes"),
-                        ],
+                    BodyMediumText(
+                      text: transactionData.containsKey('discountIdImage')
+                          ? 'Ordered by: Customer'
+                          : transactionData['discounted'] == false
+                              ? 'Ordered by: Retailer'
+                              : '',
+                    ),
+                    if (transactionData.containsKey('discountIdImage'))
+                      BodyMediumText(
+                        text: transactionData['discountIdImage'] != null &&
+                                transactionData['discountIdImage'] != ""
+                            ? 'Discounted: Yes'
+                            : 'Discounted: No',
                       ),
+                    const SizedBox(height: 5),
                     BodyMediumText(
                         text: "Order Status: ${transactionData['status']}"),
                     const Divider(),

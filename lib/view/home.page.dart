@@ -2,6 +2,7 @@ import 'package:driver_app/widgets/tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,7 +20,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchData() async {
     final Uri url = Uri.parse(
-        'https://lpg-api-06n8.onrender.com/api/v1/transactions?filter={"__t":"Delivery"}');
+      'https://lpg-api-06n8.onrender.com/api/v1/transactions?filter={"__t":"Delivery"}',
+    );
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -40,14 +42,21 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
+        elevation: 1,
         title: const Text(
           'Deliveries',
           style: TextStyle(
             color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
+        ),
+        centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
         ),
         actions: [
           IconButton(
@@ -60,24 +69,16 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
-        backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
-        centerTitle: true,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
       ),
+      backgroundColor: Colors.white,
       body: transactions == null
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: const Color(0xFF050404).withOpacity(0.8),
+                rightDotColor: const Color(0xFFd41111).withOpacity(0.8),
+                size: 40,
+              ),
+            )
           : CustomTabBar(transactions: transactions!),
     );
   }

@@ -92,7 +92,7 @@ class CompletedCard extends StatelessWidget {
                               double.parse(
                                   (item['customerPrice']).toStringAsFixed(2)));
 
-                          return '$itemName (₱$price x $quantity)';
+                          return '$itemName ₱$price (x$quantity)';
                         }
                       }).join(', ')}',
                     ),
@@ -110,7 +110,7 @@ class CompletedCard extends StatelessWidget {
                               double.parse(
                                   (item['retailerPrice']).toStringAsFixed(2)));
 
-                          return '$itemName (₱$price x $quantity)';
+                          return '$itemName ₱$price (x$quantity)';
                         }
                       }).join(', ')}',
                     ),

@@ -29,6 +29,7 @@ class OnGoingCard extends StatelessWidget {
           Visibility(
             visible: isPending && !isCompleted,
             child: Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
                 child: Column(
@@ -104,7 +105,7 @@ class OnGoingCard extends StatelessWidget {
                                 double.parse((item['customerPrice'])
                                     .toStringAsFixed(2)));
 
-                            return '$itemName (₱$price x $quantity)';
+                            return '$itemName ₱$price (x$quantity)';
                           }
                         }).join(', ')}',
                       ),
@@ -122,7 +123,7 @@ class OnGoingCard extends StatelessWidget {
                                 double.parse((item['retailerPrice'])
                                     .toStringAsFixed(2)));
 
-                            return '$itemName (₱$price x $quantity)';
+                            return '$itemName ₱$price (x$quantity)';
                           }
                         }).join(', ')}',
                       ),

@@ -9,33 +9,40 @@ class PickUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFe7e0e0),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
+        elevation: 1,
         title: const Text(
           'Pick Up Deliveries',
           style: TextStyle(
             color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color(0xFFd41111),
         centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
-      body: Column(
-        children: [
-          PickedUpCard(
-            buttonText: 'PICKED UP',
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                authenticateRoute,
-                arguments: {'transactionData': transactionData},
-              );
-            },
-            btncolor: const Color(0xFF5E738A),
-            transactionData: transactionData,
-          ),
-        ],
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            PickedUpCard(
+              buttonText: 'PICKED UP',
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  authenticateRoute,
+                  arguments: {'transactionData': transactionData},
+                );
+              },
+              btncolor: const Color(0xFFA81616).withOpacity(0.4),
+              transactionData: transactionData,
+            ),
+          ],
+        ),
       ),
     );
   }

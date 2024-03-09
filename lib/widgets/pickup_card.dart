@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:driver_app/widgets/custom_button.dart';
+import 'package:driver_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -29,51 +30,48 @@ class PickedUpCard extends StatefulWidget {
 
 class _PickedUpCardState extends State<PickedUpCard> {
   File? _image;
-  bool _imageCaptured = false;
-
+  bool isImageSelected = false;
   bool _googleMapsLaunched = false;
+  final _imageStreamController = StreamController<File?>.broadcast();
 
   Future<void> _getImageFromCamera() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+      _imageStreamController.sink.add(imageFile);
+
       setState(() {
-        _image = File(pickedFile.path);
-        _imageCaptured = true;
+        _image = imageFile;
+        isImageSelected = true;
       });
     }
   }
 
-  Future<void> _launchGoogleMaps(double latitude, double longitude) async {
-    try {
-      if (!_googleMapsLaunched) {
-        _googleMapsLaunched = true;
-        await Future.delayed(Duration(seconds: 5));
-        await MapsLauncher.launchCoordinates(latitude, longitude);
+  Future<void> _getImageFromGallery() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
-        await _updateTransaction(
-          widget.transactionData['_id'],
-          widget.transactionData['pickupImages'],
-        );
+    if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+      _imageStreamController.sink.add(imageFile);
 
-        if (widget.onPressed != null) {
-          widget.onPressed();
-        }
-      }
-    } catch (e) {
-      print('Error launching Google Maps: $e');
+      setState(() {
+        _image = imageFile;
+        isImageSelected = true;
+      });
     }
   }
 
   void _deleteImage() {
     setState(() {
       _image = null;
-      _imageCaptured = false;
+      isImageSelected = false;
     });
   }
 
-  Future<String> _uploadImage(File imageFile) async {
+  Future<Map<String, dynamic>?> _uploadImage(File imageFile) async {
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -110,25 +108,39 @@ class _PickedUpCardState extends State<PickedUpCard> {
       var response = await request.send();
 
       if (response.statusCode == 200) {
-        var responseBody = await response.stream.bytesToString();
-        var decodedResponse = json.decode(responseBody);
-        print('Upload success: $decodedResponse');
+        final responseBody = await response.stream.bytesToString();
+        print("Image uploaded successfully: $responseBody");
 
-        String pickupImagePaths = decodedResponse['data'][0]['path'];
+        final parsedResponse = json.decode(responseBody);
 
-        return pickupImagePaths;
+        if (parsedResponse.containsKey('data')) {
+          final List<dynamic> data = parsedResponse['data'];
+
+          if (data.isNotEmpty && data[0].containsKey('path')) {
+            final ImageUrl = data[0]['path'];
+            print("Image URL: $ImageUrl");
+            return {'url': ImageUrl};
+          } else {
+            print("Invalid response format: $parsedResponse");
+            return null;
+          }
+        } else {
+          print("Invalid response format: $parsedResponse");
+          return null;
+        }
       } else {
-        print('Upload failed with status ${response.statusCode}');
-        return '';
+        print("Image upload failed with status code: ${response.statusCode}");
+        final responseBody = await response.stream.bytesToString();
+        print("Response body: $responseBody");
+        return null;
       }
-    } catch (error) {
-      print('Error uploading image: $error');
-      return '';
+    } catch (e) {
+      print("Image upload failed with error: $e");
+      return null;
     }
   }
 
-  Future<void> _updateTransaction(
-      String transactionId, String pickupImagePaths) async {
+  Future<void> _updateTransaction(String transactionId) async {
     try {
       String deliveryLocation = widget.transactionData['deliveryLocation'];
       List<double> coordinates = await _geocodeAddress(deliveryLocation);
@@ -137,8 +149,17 @@ class _PickedUpCardState extends State<PickedUpCard> {
         double deliveryLocationLatitude = coordinates[0];
         double deliveryLocationLongitude = coordinates[1];
 
+        String pickupImagePath = "";
+
+        if (_image != null) {
+          var uploadResponse = await _uploadImage(_image!);
+          if (uploadResponse != null) {
+            pickupImagePath = uploadResponse["url"];
+          }
+        }
+
         Map<String, dynamic> updateData = {
-          "pickupImages": pickupImagePaths,
+          "pickupImages": pickupImagePath,
           "pickedUp": true,
           "__t": "Delivery",
           "status": "On Going",
@@ -152,10 +173,8 @@ class _PickedUpCardState extends State<PickedUpCard> {
           body: json.encode(updateData),
         );
         if (response.statusCode == 200) {
-          print(pickupImagePaths);
-          print('Transaction updated successfully');
-          print('Response: ${response.body}');
-          print(response.statusCode);
+          print(response.body);
+          print(response.body);
 
           await _launchGoogleMaps(
               deliveryLocationLatitude, deliveryLocationLongitude);
@@ -177,7 +196,7 @@ class _PickedUpCardState extends State<PickedUpCard> {
   }
 
   Future<List<double>> _geocodeAddress(String address) async {
-    final apiKey = '397b2724db1f4de58cf440e681d855bc';
+    const apiKey = '397b2724db1f4de58cf440e681d855bc';
     final apiUrl = Uri.parse('https://api.geoapify.com/v1/geocode/search');
     final text = Uri.encodeComponent(address);
 
@@ -207,367 +226,277 @@ class _PickedUpCardState extends State<PickedUpCard> {
     }
   }
 
+  Future<void> _launchGoogleMaps(double latitude, double longitude) async {
+    try {
+      if (!_googleMapsLaunched) {
+        _googleMapsLaunched = true;
+        await Future.delayed(const Duration(seconds: 5));
+        await MapsLauncher.launchCoordinates(latitude, longitude);
+
+        await _updateTransaction(widget.transactionData['_id']);
+
+        if (widget.onPressed != null) {
+          widget.onPressed();
+        }
+      }
+    } catch (e) {
+      print('Error launching Google Maps: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('Transaction Data: ${widget.transactionData['rider']}');
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(28, 10, 28, 10),
-      child: Column(
-        children: [
-          Card(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(25, 25, 25, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Transaction ID: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+        child: Column(
+          children: [
+            Card(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(25, 25, 25, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Column(
+                        children: [
+                          const BodyMedium(
+                            text: "Transaction ID:",
                           ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['_id']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    color: Colors.black,
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Receiver Name: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
+                          BodyMedium(
+                            text: widget.transactionData['_id'],
                           ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['name']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Receiver Contact Number: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['contactNumber']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Pin Location: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['deliveryLocation']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "House#/Lot/Blk:",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['houseLotBlk']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Barangay: ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF050404),
-                              ),
-                            ),
-                            TextSpan(
-                              text: '${widget.transactionData['barangay']}',
-                              style: TextStyle(color: Color(0xFF050404)),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
+                    ),
+                    const Divider(),
+                    BodyMediumText(
+                      text:
+                          widget.transactionData.containsKey('discountIdImage')
+                              ? 'Ordered by: Customer'
+                              : widget.transactionData['discounted'] == false
+                                  ? 'Ordered by: Retailer'
+                                  : '',
+                    ),
+                    if (widget.transactionData.containsKey('discountIdImage'))
+                      BodyMediumText(
+                        text: widget.transactionData['discountIdImage'] !=
+                                    null &&
+                                widget.transactionData['discountIdImage'] != ""
+                            ? 'Discounted: Yes'
+                            : 'Discounted: No',
+                      ),
+                    const SizedBox(height: 5),
+                    BodyMediumText(
+                        text:
+                            "Order Status: ${widget.transactionData['status']}"),
+                    const Divider(),
+                    const Center(
+                      child: BodyMedium(text: "Receiver Infomation"),
+                    ),
+                    const SizedBox(height: 5),
+                    BodyMediumText(
+                        text: "Name: ${widget.transactionData['name']}"),
+                    BodyMediumText(
+                        text:
+                            "Mobile Number: ${widget.transactionData['contactNumber']}"),
+                    BodyMediumOver(
+                        text:
+                            "House Number: ${widget.transactionData['houseLotBlk']}"),
+                    BodyMediumText(
+                        text:
+                            "Barangay: ${widget.transactionData['barangay']}"),
+                    BodyMediumOver(
+                        text:
+                            "Delivery Location: ${widget.transactionData['deliveryLocation']}"),
+                    const Divider(),
+                    BodyMediumText(
+                        text:
+                            'Payment Method: ${widget.transactionData['paymentMethod'] == 'COD' ? 'Cash on Delivery' : widget.transactionData['paymentMethod']}'),
+                    if (widget.transactionData.containsKey('discountIdImage'))
+                      BodyMediumText(
+                        text:
+                            'Assemble Option: ${widget.transactionData['assembly'] ? 'Yes' : 'No'}',
+                      ),
+                    BodyMediumOver(
+                      text:
+                          'Delivery Date and Time: ${DateFormat('MMMM d, y - h:mm a').format(DateTime.parse(widget.transactionData['deliveryDate']))}',
+                    ),
+                    const Divider(),
+                    if (widget.transactionData.containsKey('discountIdImage'))
+                      BodyMediumOver(
+                        text:
+                            'Items: ${widget.transactionData['items']!.map((item) {
+                          if (item is Map<String, dynamic> &&
+                              item.containsKey('name') &&
+                              item.containsKey('quantity') &&
+                              item.containsKey('customerPrice')) {
+                            final itemName = item['name'];
+                            final quantity = item['quantity'];
+                            final price = NumberFormat.decimalPattern().format(
+                                double.parse((item['customerPrice'])
+                                    .toStringAsFixed(2)));
 
-                      Spacer(), // Adjustable space
-                    ],
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Payment Method: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['paymentMethod']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
+                            return '$itemName (₱$price x $quantity)';
+                          }
+                        }).join(', ')}',
+                      ),
+                    if (!widget.transactionData
+                            .containsKey('discountIdImage') &&
+                        widget.transactionData['discounted'] == false)
+                      BodyMediumOver(
+                        text:
+                            'Items: ${widget.transactionData['items']!.map((item) {
+                          if (item is Map<String, dynamic> &&
+                              item.containsKey('name') &&
+                              item.containsKey('quantity') &&
+                              item.containsKey('retailerPrice')) {
+                            final itemName = item['name'];
+                            final quantity = item['quantity'];
+                            final price = NumberFormat.decimalPattern().format(
+                                double.parse((item['retailerPrice'])
+                                    .toStringAsFixed(2)));
+
+                            return '$itemName (₱$price x $quantity)';
+                          }
+                        }).join(', ')}',
+                      ),
+                    BodyMediumText(
+                      text:
+                          'Total: ₱${NumberFormat.decimalPattern().format(double.parse((widget.transactionData['total']).toStringAsFixed(2)))}',
                     ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Assemble Option: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: widget.transactionData['assembly'] != null
-                              ? (widget.transactionData['assembly']
-                                  ? 'Yes'
-                                  : 'No')
-                              : 'N/A',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Items: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (widget.transactionData['items'] != null)
-                          TextSpan(
-                            text: (widget.transactionData['items'] as List)
-                                .map((item) {
-                              if (item is Map<String, dynamic> &&
-                                  item.containsKey('name') &&
-                                  item.containsKey('quantity')) {
-                                return '${item['name']} (${item['quantity']})';
-                              }
-                              return '';
-                            }).join(', '),
-                          ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: "Total Price: ",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(
-                          text: '₱${widget.transactionData['total']}',
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    color: Colors.black,
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Ordered By: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['name']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Ordered By Contact Number: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF050404),
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${widget.transactionData['contactNumber']}',
-                          style: TextStyle(color: Color(0xFF050404)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Delivery Date/Time: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(
-                          text: widget.transactionData['updatedAt'] != null
-                              ? DateFormat('MMM d, y - h:mm a').format(
-                                  DateTime.parse(
-                                      widget.transactionData['updatedAt']),
-                                )
-                              : 'null',
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      if (_imageCaptured) {
-                        _deleteImage();
-                      } else {
-                        _getImageFromCamera();
-                      }
-                    },
-                    child: Stack(
-                      children: [
-                        _imageCaptured
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                  child: Image.file(
-                                    _image!,
-                                    width: double.infinity,
-                                    height: 100.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 2.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: 100,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          color: Color(0xFF5E738A),
-                                        ),
-                                      ),
+                    const SizedBox(height: 10),
+                    StreamBuilder<File?>(
+                      stream: _imageStreamController.stream,
+                      builder: (context, snapshot) {
+                        return GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: const Icon(Icons.camera),
+                                      title: const Text('Take a Photo'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _getImageFromCamera();
+                                        isImageSelected = true;
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.photo_library),
+                                      title: const Text('Choose from Gallery'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _getImageFromGallery();
+                                        isImageSelected = true;
+                                      },
                                     ),
                                   ],
+                                );
+                              },
+                            );
+                          },
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFF050404).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: snapshot.data != null
+                                      ? Image.file(
+                                          snapshot.data!,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Icon(
+                                          Icons.camera_alt,
+                                          color: const Color(0xFF050404)
+                                              .withOpacity(0.6),
+                                        ),
                                 ),
                               ),
-                        Positioned(
-                          top: 5,
-                          right: 5,
-                          child: _imageCaptured
-                              ? IconButton(
-                                  onPressed: _deleteImage,
-                                  icon: Icon(
-                                    Icons.close,
-                                    color: Colors.red,
-                                  ),
-                                )
-                              : SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  CardButton(
-                    text: widget.buttonText,
-                    onPressed: () async {
-                      if (_image != null) {
-                        // Upload the image and get the pickupImagePaths
-                        String pickupImagePaths = await _uploadImage(_image!);
-
-                        // Call _updateTransaction with both arguments
-                        _updateTransaction(
-                            widget.transactionData['_id'], pickupImagePaths);
-
-                        if (widget.onPressed != null) {
-                          widget.onPressed();
-                        }
-                      } else {
-                        print('No image captured.');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('No image captured.'),
-                            duration: Duration(
-                                seconds:
-                                    2), // Set the duration for the snackbar
-                            backgroundColor: Colors.red,
+                            ],
                           ),
                         );
-                      }
-                    },
-                    color: _imageCaptured ? Color(0xFFBD2019) : widget.btncolor,
-                  ),
-                ],
+                      },
+                    ),
+                    const SizedBox(height: 5),
+                    CardButton(
+                      text: widget.buttonText,
+                      onPressed: () async {
+                        if (!isImageSelected) {
+                          showCustomOverlay(
+                              context, 'Please Upload a Pick-up Image');
+                        } else {
+                          _updateTransaction(widget.transactionData['_id']);
+
+                          if (widget.onPressed != null) {
+                            widget.onPressed();
+                          }
+                        }
+                      },
+                      color: isImageSelected
+                          ? const Color(0xFFA81616).withOpacity(0.9)
+                          : widget.btncolor,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+}
+
+void showCustomOverlay(BuildContext context, String message) {
+  final overlay = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).size.height * 0.5,
+      left: 20,
+      right: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            color: const Color(0xFFd41111).withOpacity(0.7),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Text(
+            message,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Overlay.of(context)!.insert(overlay);
+
+  Future.delayed(const Duration(seconds: 2), () {
+    overlay.remove();
+  });
 }
