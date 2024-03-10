@@ -291,180 +291,190 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
             ),
             SpareButton(
               text: 'CANCEL ORDER',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    final formKey = GlobalKey<FormState>();
+              onPressed: isScanningSuccessful
+                  ? null
+                  : () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          final formKey = GlobalKey<FormState>();
 
-                    return AlertDialog(
-                      title: const Center(
-                        child: Text(
-                          'Cancel Order',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      content: Form(
-                        key: formKey,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              StreamBuilder<File?>(
-                                stream: _imageStreamController.stream,
-                                builder: (context, snapshot) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              ListTile(
-                                                leading:
-                                                    const Icon(Icons.camera),
-                                                title:
-                                                    const Text('Take a Photo'),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _getImageFromCamera();
-                                                  isImageSelected = true;
-                                                },
-                                              ),
-                                              ListTile(
-                                                leading: const Icon(
-                                                    Icons.photo_library),
-                                                title: const Text(
-                                                    'Choose from Gallery'),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _getImageFromGallery();
-                                                  isImageSelected = true;
-                                                },
+                          return AlertDialog(
+                            title: const Center(
+                              child: Text(
+                                'Cancel Order',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            content: Form(
+                              key: formKey,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    StreamBuilder<File?>(
+                                      stream: _imageStreamController.stream,
+                                      builder: (context, snapshot) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: <Widget>[
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                          Icons.camera),
+                                                      title: const Text(
+                                                          'Take a Photo'),
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                        _getImageFromCamera();
+                                                        isImageSelected = true;
+                                                      },
+                                                    ),
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                          Icons.photo_library),
+                                                      title: const Text(
+                                                          'Choose from Gallery'),
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                        _getImageFromGallery();
+                                                        isImageSelected = true;
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Stack(
+                                            alignment: Alignment.topRight,
+                                            children: [
+                                              Container(
+                                                width: 300,
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF050404)
+                                                      .withOpacity(0.2),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: snapshot.data != null
+                                                      ? Image.file(
+                                                          snapshot.data!,
+                                                          width:
+                                                              double.infinity,
+                                                          height:
+                                                              double.infinity,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Icon(
+                                                          Icons.camera_alt,
+                                                          color: const Color(
+                                                                  0xFF050404)
+                                                              .withOpacity(0.6),
+                                                        ),
+                                                ),
                                               ),
                                             ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                    child: Stack(
-                                      alignment: Alignment.topRight,
-                                      children: [
-                                        Container(
-                                          width: 300,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF050404)
-                                                .withOpacity(0.2),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
                                           ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: snapshot.data != null
-                                                ? Image.file(
-                                                    snapshot.data!,
-                                                    width: double.infinity,
-                                                    height: double.infinity,
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : Icon(
-                                                    Icons.camera_alt,
-                                                    color:
-                                                        const Color(0xFF050404)
-                                                            .withOpacity(0.6),
-                                                  ),
-                                          ),
-                                        ),
-                                      ],
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
+                                    const SizedBox(height: 10),
+                                    EditTextField(
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: null,
+                                      controller: cancelReasonController,
+                                      labelText: "Reason",
+                                      hintText: 'Enter the Reason',
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return 'Please Enter the Reason';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: 10),
-                              EditTextField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                controller: cancelReasonController,
-                                labelText: "Reason",
-                                hintText: 'Enter the Reason',
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Please Enter the Reason';
-                                  }
-                                  return null;
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
                                 },
+                                style: TextButton.styleFrom(
+                                  foregroundColor:
+                                      const Color(0xFF050404).withOpacity(0.7),
+                                ),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  if (!isImageSelected) {
+                                    showCustomOverlay(context,
+                                        'Please Upload a Cancellation Image');
+                                  } else {
+                                    if (formKey.currentState!.validate()) {
+                                      String cancelImagepath = "";
+
+                                      if (_image != null) {
+                                        var uploadResponse =
+                                            await _uploadImage(_image!);
+                                        if (uploadResponse != null) {
+                                          cancelImagepath = uploadResponse;
+                                        }
+                                      }
+
+                                      String cancelReason =
+                                          cancelReasonController.text;
+
+                                      _updateTransaction(
+                                        transactionData['_id'],
+                                        cancelImagepath,
+                                        cancelReason,
+                                      );
+
+                                      Navigator.pop(context);
+                                      Navigator.pushNamed(context, homeRoute);
+                                    }
+                                  }
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor:
+                                      const Color(0xFF050404).withOpacity(0.9),
+                                ),
+                                child: const Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor:
-                                const Color(0xFF050404).withOpacity(0.7),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            if (!isImageSelected) {
-                              showCustomOverlay(context,
-                                  'Please Upload a Cancellation Image');
-                            } else {
-                              if (formKey.currentState!.validate()) {
-                                String cancelImagepath = "";
-
-                                if (_image != null) {
-                                  var uploadResponse =
-                                      await _uploadImage(_image!);
-                                  if (uploadResponse != null) {
-                                    cancelImagepath = uploadResponse;
-                                  }
-                                }
-
-                                String cancelReason =
-                                    cancelReasonController.text;
-
-                                _updateTransaction(
-                                  transactionData['_id'],
-                                  cancelImagepath,
-                                  cancelReason,
-                                );
-
-                                Navigator.pop(context);
-                                Navigator.pushNamed(context, homeRoute);
-                              }
-                            }
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor:
-                                const Color(0xFF050404).withOpacity(0.9),
-                          ),
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              backgroundColor: const Color(0xFFA81616).withOpacity(0.9),
-              color: Colors.white,
+                          );
+                        },
+                      );
+                    },
+              backgroundColor: isScanningSuccessful
+                  ? const Color(0xFF050404).withOpacity(0.2)
+                  : const Color(0xFFA81616).withOpacity(0.9),
+              color: isScanningSuccessful
+                  ? const Color(0xFF050404).withOpacity(0.5)
+                  : Colors.white,
             ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
