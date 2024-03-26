@@ -535,7 +535,7 @@ class _DropOffPageState extends State<DropOffPage> {
                   children: [
                     const SizedBox(height: 10),
                     Text(
-                      "E-Wallet Driver Information",
+                      "Gcash Information",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -609,11 +609,10 @@ class _DropOffPageState extends State<DropOffPage> {
                                         const SizedBox(height: 10),
                                         BodyMediumOver(
                                           text:
-                                              "Gcash Name: ${riderData['name']}",
+                                              "Gcash Name: Julina Marie F. Bibangco",
                                         ),
                                         BodyMediumText(
-                                          text:
-                                              "GCash Number: ${riderData['gcash']}",
+                                          text: "GCash Number: 09193599448",
                                         ),
                                         DropdownButtonFormField(
                                           value: selectedPayment,
