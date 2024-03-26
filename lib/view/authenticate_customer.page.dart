@@ -268,7 +268,7 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                   ? const Color(0xFF050404).withOpacity(0.2)
                   : const Color(0xFFA81616).withOpacity(0.9),
               color: isScanningSuccessful
-                  ? const Color(0xFF050404).withOpacity(0.5)
+                  ? Color.fromARGB(255, 237, 229, 229).withOpacity(0.5)
                   : Colors.white,
             ),
             SpareButton(
@@ -289,6 +289,15 @@ class _AuthenticatePageState extends State<AuthenticatePage> {
                   ? Colors.white
                   : const Color(0xFF050404).withOpacity(0.5),
             ),
+            // ElevatedButton(
+            //     onPressed: () {
+            //       Navigator.pushNamed(
+            //         context,
+            //         dropOffRoute,
+            //         arguments: {'transactionData': transactionData},
+            //       );
+            //     },
+            //     child: Text('Drop Off')),
             SpareButton(
               text: 'CANCEL ORDER',
               onPressed: isScanningSuccessful

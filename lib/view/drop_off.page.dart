@@ -29,6 +29,7 @@ class _DropOffPageState extends State<DropOffPage> {
   bool _imageCaptured = false;
   String? selectedPayment;
   final formKey = GlobalKey<FormState>();
+  bool showDriverInformation = false;
 
   @override
   Widget build(BuildContext context) {
@@ -167,9 +168,13 @@ class _DropOffPageState extends State<DropOffPage> {
           'https://lpg-api-06n8.onrender.com/api/v1/transactions/$transactionId/complete';
 
       Map<String, dynamic> updateData = {
-        "paymentMethod": paymentMethod,
         "completionImages": pickupImagePath,
       };
+
+      if (paymentMethod != null && paymentMethod.isNotEmpty) {
+        updateData["paymentMethod"] = paymentMethod;
+      }
+
       print(paymentMethod);
       try {
         final http.Response response = await http.patch(
@@ -265,106 +270,6 @@ class _DropOffPageState extends State<DropOffPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(28, 5, 28, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  Text(
-                    "E-Wallet Driver Information",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF050404).withOpacity(0.9),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Consumer<UserProvider>(
-                    builder: (context, userProvider, child) {
-                      String? userId = userProvider.userId;
-                      return FutureBuilder<Map<String, dynamic>>(
-                        future: fetchRider(userId!),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(
-                              child: LoadingAnimationWidget.flickr(
-                                leftDotColor:
-                                    const Color(0xFF050404).withOpacity(0.8),
-                                rightDotColor:
-                                    const Color(0xFFd41111).withOpacity(0.8),
-                                size: 40,
-                              ),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            Map<String, dynamic> riderData = snapshot.data!;
-                            return SizedBox(
-                              width: 320,
-                              child: Card(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.of(context)
-                                              .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                FullScreenImageView(
-                                                    imageUrl:
-                                                        riderData['gcashQr'],
-                                                    onClose: () =>
-                                                        Navigator.of(context)
-                                                            .pop()),
-                                          ));
-                                        },
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          child: Container(
-                                            width: double.infinity,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.rectangle,
-                                              image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(
-                                                  riderData['gcashQr'] ?? '',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      BodyMediumOver(
-                                        text:
-                                            "Gcash Name: ${riderData['name']}",
-                                      ),
-                                      BodyMediumText(
-                                        text:
-                                            "GCash Number: ${riderData['gcash']}",
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(28, 0, 28, 10),
               child: Column(
@@ -588,50 +493,6 @@ class _DropOffPageState extends State<DropOffPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                DropdownButtonFormField(
-                                  value: selectedPayment,
-                                  decoration: InputDecoration(
-                                    labelText: 'Mode of Payment:',
-                                    labelStyle: TextStyle(
-                                      color: const Color(0xFF050404)
-                                          .withOpacity(0.9),
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: const Color(0xFF050404)
-                                            .withOpacity(0.9),
-                                      ),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: const Color(0xFF050404)
-                                            .withOpacity(0.9),
-                                      ),
-                                    ),
-                                  ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'COD',
-                                      child: Text('Cash on Delivery'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'GCASH',
-                                      child: Text('GCASH'),
-                                    ),
-                                  ],
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedPayment = newValue;
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return "Please Select the Mode of Payment";
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                ),
                               ],
                             ),
                           ),
@@ -642,6 +503,176 @@ class _DropOffPageState extends State<DropOffPage> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Gcash Payment',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF050404).withOpacity(0.9),
+                    ),
+                  ),
+                  Switch(
+                    value: showDriverInformation,
+                    onChanged: (value) {
+                      setState(() {
+                        showDriverInformation = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            if (showDriverInformation)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(28, 5, 28, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      "E-Wallet Driver Information",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF050404).withOpacity(0.9),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Consumer<UserProvider>(
+                      builder: (context, userProvider, child) {
+                        String? userId = userProvider.userId;
+                        return FutureBuilder<Map<String, dynamic>>(
+                          future: fetchRider(userId!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: LoadingAnimationWidget.flickr(
+                                  leftDotColor:
+                                      const Color(0xFF050404).withOpacity(0.8),
+                                  rightDotColor:
+                                      const Color(0xFFd41111).withOpacity(0.8),
+                                  size: 40,
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              Map<String, dynamic> riderData = snapshot.data!;
+                              return SizedBox(
+                                width: 320,
+                                child: Card(
+                                  color: Colors.white,
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        25, 10, 25, 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context)
+                                                .push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  FullScreenImageView(
+                                                      imageUrl:
+                                                          riderData['gcashQr'],
+                                                      onClose: () =>
+                                                          Navigator.of(context)
+                                                              .pop()),
+                                            ));
+                                          },
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Container(
+                                              width: double.infinity,
+                                              height: 100,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.rectangle,
+                                                image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(
+                                                    riderData['gcashQr'] ?? '',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        BodyMediumOver(
+                                          text:
+                                              "Gcash Name: ${riderData['name']}",
+                                        ),
+                                        BodyMediumText(
+                                          text:
+                                              "GCash Number: ${riderData['gcash']}",
+                                        ),
+                                        DropdownButtonFormField(
+                                          value: selectedPayment,
+                                          decoration: InputDecoration(
+                                            labelText: 'Mode of Payment:',
+                                            labelStyle: TextStyle(
+                                              color: const Color(0xFF050404)
+                                                  .withOpacity(0.9),
+                                            ),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: const Color(0xFF050404)
+                                                    .withOpacity(0.9),
+                                              ),
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: const Color(0xFF050404)
+                                                    .withOpacity(0.9),
+                                              ),
+                                            ),
+                                          ),
+                                          items: const [
+                                            DropdownMenuItem(
+                                              value: 'COD',
+                                              child: Text('Cash on Delivery'),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 'GCASH',
+                                              child: Text('GCASH'),
+                                            ),
+                                          ],
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              selectedPayment = newValue;
+                                            });
+                                          },
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return "Please Select the Mode of Payment";
+                                            } else {
+                                              return null;
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             Container(
               alignment: Alignment.bottomCenter,
               child: Column(
